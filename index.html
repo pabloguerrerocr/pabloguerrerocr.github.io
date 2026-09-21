@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pablo Guerrero — Economista</title>
+<meta name="description" content="Economista del sector externo costarricense. Series de tiempo, VAR/VECM y datos oficiales. Cada número rastreable hasta su origen.">
+<meta property="og:title" content="Pablo Guerrero — Economista">
+<meta property="og:description" content="Economista del sector externo costarricense. Series de tiempo, VAR/VECM y datos oficiales.">
+<meta property="og:type" content="profile">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --tinta:#12243a;
+    --tinta-2:#2c415c;
+    --azul:#1b4f8a;
+    --ocre:#a8621a;
+    --fondo:#f4f5f6;
+    --papel:#ffffff;
+    --papel-2:#eceef0;
+    --linea:#d7dade;
+    --texto:#1a1f26;
+    --tenue:#5d666f;
+    --radio:4px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --tinta:#dfe6ee;
+      --tinta-2:#a9bed6;
+      --azul:#7fb3e8;
+      --ocre:#e0995a;
+      --fondo:#0e1319;
+      --papel:#161c24;
+      --papel-2:#1e262f;
+      --linea:#2c353f;
+      --texto:#e4e8ec;
+      --tenue:#95a0ac;
+    }
+  }
+  :root[data-theme="dark"]{
+    --tinta:#dfe6ee; --tinta-2:#a9bed6; --azul:#7fb3e8; --ocre:#e0995a;
+    --fondo:#0e1319; --papel:#161c24; --papel-2:#1e262f; --linea:#2c353f;
+    --texto:#e4e8ec; --tenue:#95a0ac;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    padding:0 20px;
+    background:var(--fondo);
+    color:var(--texto);
+    font-family:"Public Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .caja{max-width:780px;margin:0 auto;}
+
+  a{color:var(--azul);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s;}
+  a:hover{border-bottom-color:var(--azul);}
+  a:focus-visible{outline:2px solid var(--ocre);outline-offset:3px;border-radius:2px;}
+
+  /* ---- encabezado ---- */
+  header{padding-block:64px 40px;border-bottom:3px double var(--tinta);}
+  .kicker{
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ocre);margin:0 0 18px;
+  }
+  h1{
+    font-family:"Newsreader", Georgia, "Times New Roman", serif;
+    font-weight:500;font-size:clamp(38px, 8vw, 58px);line-height:1.02;
+    letter-spacing:-.02em;margin:0 0 6px;color:var(--tinta);
+  }
+  .rol{
+    font-family:"Newsreader", Georgia, serif;font-style:italic;
+    font-size:clamp(18px, 3.4vw, 22px);color:var(--tenue);margin:0 0 26px;font-weight:400;
+  }
+  .tesis{
+    font-size:clamp(17px, 2.6vw, 19px);line-height:1.62;max-width:56ch;margin:0 0 28px;
+    color:var(--texto);
+  }
+  .tesis b{font-weight:600;color:var(--tinta);}
+  .meta{
+    display:flex;flex-wrap:wrap;gap:8px 20px;
+    font-family:"JetBrains Mono", ui-monospace, monospace;font-size:12.5px;color:var(--tenue);
+  }
+  .meta span::before{content:"— ";color:var(--linea);}
+  .meta span:first-child::before{content:"";}
+
+  /* ---- secciones ---- */
+  section{padding-block:48px;border-bottom:1px solid var(--linea);}
+  section:last-of-type{border-bottom:none;}
+  h2{
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;
+    color:var(--ocre);margin:0 0 6px;
+  }
+  .lead{
+    font-family:"Newsreader", Georgia, serif;
+    font-size:clamp(22px, 4vw, 27px);line-height:1.25;font-weight:500;
+    color:var(--tinta);margin:0 0 30px;max-width:30ch;text-wrap:balance;
+  }
+
+  /* ---- hallazgos ---- */
+  .hallazgo{
+    display:grid;grid-template-columns:minmax(0,150px) 1fr;gap:6px 28px;
+    padding-block:24px;border-top:1px solid var(--linea);
+  }
+  .hallazgo:first-of-type{border-top:2px solid var(--tinta);}
+  .cifra{
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+    font-size:clamp(28px, 6vw, 36px);font-weight:500;line-height:1;
+    color:var(--ocre);font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  }
+  .cifra small{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--tenue);margin-top:8px;font-weight:400;}
+  .hallazgo h3{
+    font-family:"Newsreader", Georgia, serif;font-size:20px;font-weight:600;
+    margin:0 0 6px;color:var(--tinta);line-height:1.25;
+  }
+  .hallazgo p{margin:0 0 8px;color:var(--texto);}
+  .limite{
+    font-size:13.5px;color:var(--tenue);border-left:2px solid var(--linea);
+    padding-left:12px;margin:10px 0 0;
+  }
+  .limite b{color:var(--ocre);font-weight:600;}
+  .fuente{
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+    font-size:11.5px;color:var(--tenue);margin-top:10px;
+  }
+
+  /* ---- proyectos ---- */
+  .repos{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;}
+  .repo{background:var(--papel);padding:18px 20px;}
+  .repo:hover{background:var(--papel-2);}
+  .repo h3{margin:0 0 4px;font-size:15.5px;font-weight:600;}
+  .repo h3 a{color:var(--tinta);border-bottom-color:var(--linea);}
+  .repo h3 a:hover{color:var(--azul);border-bottom-color:var(--azul);}
+  .repo p{margin:0;font-size:14px;color:var(--tenue);line-height:1.55;}
+  .repo .tags{
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+    font-size:11px;color:var(--ocre);margin-top:8px;letter-spacing:.04em;
+  }
+
+  /* ---- metodo ---- */
+  .metodo{counter-reset:m;display:grid;gap:22px;}
+  .metodo li{list-style:none;padding-left:46px;position:relative;}
+  .metodo li::before{
+    counter-increment:m;content:counter(m, decimal-leading-zero);
+    position:absolute;left:0;top:2px;
+    font-family:"JetBrains Mono", ui-monospace, monospace;font-size:12px;
+    color:var(--papel);background:var(--tinta);
+    width:30px;height:30px;display:grid;place-items:center;border-radius:50%;
+  }
+  .metodo h3{margin:0 0 4px;font-size:16.5px;font-weight:600;color:var(--tinta);}
+  .metodo p{margin:0;color:var(--tenue);font-size:15px;}
+
+  /* ---- ficha ---- */
+  .ficha{width:100%;border-collapse:collapse;font-size:15px;}
+  .ficha th,.ficha td{text-align:left;padding:13px 0;border-bottom:1px solid var(--linea);vertical-align:top;}
+  .ficha th{
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+    font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--tenue);font-weight:400;width:34%;padding-right:20px;
+  }
+  .ficha tr:last-child th,.ficha tr:last-child td{border-bottom:none;}
+  .ficha td b{font-weight:600;color:var(--tinta);}
+  .ficha td small{display:block;color:var(--tenue);font-size:13px;margin-top:2px;}
+
+  /* ---- contacto ---- */
+  .contacto{padding-block:52px 72px;}
+  .contacto .lead{max-width:24ch;}
+  .enlaces{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;}
+  .enlaces a{
+    display:inline-flex;align-items:center;gap:8px;
+    border:1px solid var(--tinta);color:var(--tinta);
+    padding:11px 20px;border-radius:var(--radio);
+    font-size:15px;font-weight:600;transition:all .15s;
+  }
+  .enlaces a:hover{background:var(--tinta);color:var(--fondo);border-color:var(--tinta);}
+  .enlaces a.primario{background:var(--tinta);color:var(--fondo);}
+  .enlaces a.primario:hover{background:var(--azul);border-color:var(--azul);}
+
+  footer{
+    padding-block:26px 40px;border-top:1px solid var(--linea);
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+    font-size:11.5px;color:var(--tenue);
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+
+  @media (max-width: 620px){
+    .hallazgo{grid-template-columns:1fr;gap:10px;}
+    .cifra small{display:inline;margin-left:10px;}
+    .ficha th{width:auto;display:block;padding-bottom:2px;border-bottom:none;}
+    .ficha td{display:block;padding-top:0;}
+  }
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="caja">
+
+  <header>
+    <p class="kicker">San José, Costa Rica</p>
+    <h1>Pablo Guerrero</h1>
+    <p class="rol">Economista del sector externo</p>
+    <p class="tesis">Economista de formación que programa. No traduzco cifras de un sistema a otro: <b>construyo la fuente, la valido contra sí misma y declaro lo que no cierra.</b> Cada número que reporto se puede rastrear hasta su origen, y los huecos se declaran como huecos.</p>
+    <div class="meta">
+      <span>Licenciatura en Economía · Universidad Latina</span>
+      <span>Practicante en el Banco Central de Costa Rica</span>
+      <span>Español nativo · Inglés C1</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Hallazgos</h2>
+    <p class="lead">Investigación propia sobre datos públicos, reproducible de punta a punta.</p>
+
+    <div class="hallazgo">
+      <div class="cifra">44,4 %<small>a 24 meses</small></div>
+      <div>
+        <h3>El canal financiero de Estados Unidos domina al real</h3>
+        <p>A 24 meses, la tasa de política de la Reserva Federal explica el <b>44,4 %</b> de la varianza de las reservas internacionales de Costa Rica. El ciclo industrial estadounidense explica <b>3,3 %</b>. La dominancia del canal financiero se sostiene en las <b>14 combinaciones</b> de variable y horizonte evaluadas.</p>
+        <p class="limite"><b>Límite declarado:</b> la descomposición depende del orden de Cholesky, que es una decisión económica y no estadística. Está documentada en el repositorio.</p>
+        <p class="fuente">VAR/VECM · 2015–2025 · BCCR y FRED</p>
+      </div>
+    </div>
+
+    <div class="hallazgo">
+      <div class="cifra">14,1<small>mil millones USD</small></div>
+      <div>
+        <h3>Costa Rica y sus socios no reportan el mismo comercio</h3>
+        <p>Costa Rica declara exportar <b>19,9 mil millones de dólares</b>; sus socios declaran importar <b>34,0 mil millones</b>. Diez años de brecha sostenida, y tres socios explican la mitad — cada uno por una razón distinta.</p>
+        <p class="limite"><b>Límite declarado:</b> parte de la brecha es esperable por valoración FOB frente a CIF y por reexportación. El análisis separa lo explicable de lo que no lo es.</p>
+        <p class="fuente">Estadísticas espejo · COMTRADE y BCCR</p>
+      </div>
+    </div>
+
+    <div class="hallazgo">
+      <div class="cifra">0,248<small>Herfindahl, desde 0,160</small></div>
+      <div>
+        <h3>El comercio se concentró en vez de diversificarse</h3>
+        <p>El índice de Herfindahl de destinos de exportación pasó de <b>0,160 a 0,248</b> en la década. Un solo capítulo arancelario explica el <b>70,5 %</b> del aumento, lo que convierte la diversificación declarada en una concentración medible.</p>
+        <p class="fuente">Comercio exterior · datos oficiales</p>
+      </div>
+    </div>
+
+    <div class="hallazgo">
+      <div class="cifra">+6,5 %<small>sobre el promedio histórico</small></div>
+      <div>
+        <h3>El referente ingenuo es difícil de vencer, y casi nadie lo reporta</h3>
+        <p>Nowcast del PIB trimestral: <b>30,6 %</b> de mejora sobre el referente ingenuo y <b>6,5 %</b> sobre el promedio histórico, que es el exigente. La señal está en producción manufacturera (t = 3,53).</p>
+        <p class="limite"><b>Límite declarado:</b> R² de 0,154 y el modelo no anticipa quiebres. Lo declaro porque un resultado que no sobrevive al escrutinio es un hallazgo, no un fracaso que esconder.</p>
+        <p class="fuente">Nowcasting · datos OCDE</p>
+      </div>
+    </div>
+
+    <div class="hallazgo">
+      <div class="cifra">5,7e-14<small>error de reconciliación</small></div>
+      <div>
+        <h3>Pasar los datos a SQL no alteró un solo número</h3>
+        <p>Warehouse en DuckDB con esquema estrella sobre un panel del sector externo: <b>18 series reconcilian</b> contra el pipeline validado en Python. El BCCR publica el comercio acumulado dentro del año; la desacumulación se resuelve con una ventana particionada y reconcilia a <b>5,7e-14</b>. Las mismas transformaciones corren como proyecto dbt, verificado con <code>EXCEPT</code> en ambas direcciones.</p>
+        <p class="fuente">DuckDB · dbt · siete chequeos de calidad que devuelven las filas que fallan</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Repositorios</h2>
+    <p class="lead">Código abierto, datos públicos, una corrida limpia repite el reporte.</p>
+    <div class="repos">
+      <div class="repo">
+        <h3><a href="https://github.com/pabloguerrerocr/sector-externo-cr-eeuu">sector-externo-cr-eeuu</a></h3>
+        <p>Transmisión del ciclo y la política monetaria de Estados Unidos al sector externo de Costa Rica. Tres bloques VAR/VECM, 26 figuras, 31 tablas, sobre datos reales 2015–2025.</p>
+        <p class="tags">VAR · VECM · cointegración · impulso-respuesta</p>
+      </div>
+      <div class="repo">
+        <h3><a href="https://github.com/pabloguerrerocr/warehouse-sector-externo">warehouse-sector-externo</a></h3>
+        <p>Esquema estrella y motor de calidad sobre el panel del sector externo, con capa dbt equivalente verificada fila por fila.</p>
+        <p class="tags">DuckDB · SQL · dbt · pruebas en el grafo</p>
+      </div>
+      <div class="repo">
+        <h3><a href="https://github.com/pabloguerrerocr/motor-series">motor-series</a></h3>
+        <p>Motor de diagnóstico de series por configuración: ADF y KPSS marcando dónde se contradicen, selección de rezagos, Engle-Granger, Johansen y holgura muestral. <b>Advierte en vez de obedecer</b>: si se le pide un VECM sobre series que no cointegran, lo estima y deja la advertencia arriba del reporte.</p>
+        <p class="tags">Python · diagnóstico declarativo</p>
+      </div>
+      <div class="repo">
+        <h3><a href="https://github.com/pabloguerrerocr/brecha-espejo-cr">brecha-espejo-cr</a></h3>
+        <p>Diez años de brecha entre lo que Costa Rica declara exportar y lo que sus socios declaran importar, descompuesta por socio y por fenómeno.</p>
+        <p class="tags">Estadísticas espejo · comercio</p>
+      </div>
+      <div class="repo">
+        <h3><a href="https://github.com/pabloguerrerocr/comercio-exterior-cr">comercio-exterior-cr</a></h3>
+        <p>Concentración de destinos y de capítulos arancelarios en la década, con el aporte de cada componente al cambio total.</p>
+        <p class="tags">Herfindahl · descomposición</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Cómo trabajo</h2>
+    <p class="lead">Tres reglas, y ninguna es negociable.</p>
+    <ol class="metodo">
+      <li>
+        <h3>El hallazgo va primero, con número</h3>
+        <p>En la primera línea. Si hay que leer tres párrafos para saber qué se encontró, el reporte está mal escrito.</p>
+      </li>
+      <li>
+        <h3>Las limitaciones se declaran</h3>
+        <p>Un resultado que no sobrevive al escrutinio es un hallazgo, no un fracaso que esconder. Lo que no cierra se dice, no se maquilla.</p>
+      </li>
+      <li>
+        <h3>Datos públicos y descarga reproducible desde el código</h3>
+        <p>Una corrida limpia repite el reporte carácter por carácter. Si no se puede reproducir, no se publica.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Ficha</h2>
+    <p class="lead">Formación y herramientas.</p>
+    <table class="ficha">
+      <tr>
+        <th>Formación</th>
+        <td>
+          <b>Licenciatura en Economía</b> — Universidad Latina de Costa Rica, en curso
+          <small>Bachillerato Universitario en Economía, abril de 2026</small>
+        </td>
+      </tr>
+      <tr>
+        <th>Experiencia actual</th>
+        <td>
+          <b>Practicante profesional</b> — Banco Central de Costa Rica
+          <small>Estadísticas de cuentas internacionales, 640 horas</small>
+        </td>
+      </tr>
+      <tr>
+        <th>Econometría</th>
+        <td>Series de tiempo, VAR y VECM, cointegración de Engle-Granger y Johansen, causalidad de Granger, impulso-respuesta con banda bootstrap, descomposición de varianza</td>
+      </tr>
+      <tr>
+        <th>Herramientas</th>
+        <td>Python (pandas, NumPy, statsmodels) · SQL, DuckDB y dbt · Power BI · Excel y Power Query · Git</td>
+      </tr>
+      <tr>
+        <th>Idiomas</th>
+        <td>
+          <b>Español nativo · Inglés C1</b>
+          <small>EF SET 61/100 — listening C2, reading C1. Dos años atendiendo cuentas de Estados Unidos.</small>
+        </td>
+      </tr>
+    </table>
+  </section>
+
+  <section class="contacto">
+    <h2>Contacto</h2>
+    <p class="lead">Estadística macroeconómica, research económico y analítica de datos.</p>
+    <p class="tesis" style="margin-bottom:22px;">Abierto a posiciones en Costa Rica o en remoto. Si querés ver cómo trabajo antes de escribirme, el código está abierto.</p>
+    <div class="enlaces">
+      <a class="primario" href="mailto:pabloguerrerocr@gmail.com">Escribime</a>
+      <a href="https://www.linkedin.com/in/pabloguerrerocr">LinkedIn</a>
+      <a href="https://github.com/pabloguerrerocr">GitHub</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>Pablo Guerrero · Costa Rica</span>
+    <span>Los datos de esta página son públicos y verificables</span>
+  </footer>
+
+</div>
+</body>
+</html>
