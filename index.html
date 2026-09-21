@@ -145,6 +145,16 @@
     font-family:"JetBrains Mono", ui-monospace, monospace;
     font-size:11px;color:var(--ocre);margin-top:8px;letter-spacing:.04em;
   }
+  .estado{
+    font-family:"JetBrains Mono", ui-monospace, monospace;
+    font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:400;
+    color:var(--tenue);border:1px solid var(--linea);border-radius:99px;
+    padding:2px 9px;margin-left:8px;vertical-align:2px;white-space:nowrap;
+  }
+  .nota-repo{
+    margin-top:10px !important;font-size:13px;color:var(--tenue);
+    border-left:2px solid var(--linea);padding-left:11px;font-style:italic;
+  }
 
   /* ---- metodo ---- */
   .metodo{counter-reset:m;display:grid;gap:22px;}
@@ -274,9 +284,10 @@
     <p class="lead">Código abierto, datos públicos, una corrida limpia repite el reporte.</p>
     <div class="repos">
       <div class="repo">
-        <h3><a href="https://github.com/pabloguerrerocr/sector-externo-cr-eeuu">sector-externo-cr-eeuu</a></h3>
-        <p>Transmisión del ciclo y la política monetaria de Estados Unidos al sector externo de Costa Rica. Tres bloques VAR/VECM, 26 figuras, 31 tablas, sobre datos reales 2015–2025.</p>
+        <h3>sector-externo-cr-eeuu <span class="estado">en revisión académica</span></h3>
+        <p>Transmisión del ciclo y la política monetaria de Estados Unidos al sector externo de Costa Rica. Tres bloques VAR/VECM, 26 figuras, 31 tablas, sobre datos reales 2015–2025. Es el análisis que sostiene el primer hallazgo de esta página.</p>
         <p class="tags">VAR · VECM · cointegración · impulso-respuesta</p>
+        <p class="nota-repo">El repositorio permanece privado hasta que concluya la revisión del Trabajo Final de Graduación. Disponible a solicitud.</p>
       </div>
       <div class="repo">
         <h3><a href="https://github.com/pabloguerrerocr/warehouse-sector-externo">warehouse-sector-externo</a></h3>
