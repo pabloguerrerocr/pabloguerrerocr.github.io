@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brecha espejo de Costa Rica · Pablo Guerrero</title>
+<meta name="description" content="Tablero interactivo: lo que Costa Rica declara exportar contra lo que sus socios declaran importar, 2015–2024, socio por socio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>/*COMUN_CSS*/</style>
+</head>
+<body>
+<div class="caja">
+  <a class="volver" href="../">← Pablo Guerrero</a>
+  <header class="top">
+    <p class="kicker">Estadísticas espejo · Costa Rica · 2015–2024</p>
+    <h1>Costa Rica y sus socios no reportan el mismo comercio</h1>
+    <p class="lede">Cada exportación se registra dos veces: la declara quien vende y la declara quien compra. Deberían coincidir y nunca coinciden. Elegí un año o un socio para ver dónde está la diferencia y qué tipo de fenómeno es.</p>
+    <div class="meta"><span>Datos: UN COMTRADE</span><span><a href="https://github.com/pabloguerrerocr/brecha-espejo-cr">Código SQL y metodología →</a></span></div>
+  </header>
+
+  <section class="panel" style="display:grid;gap:14px">
+    <div class="controles" style="margin:0">
+      <span class="anio" id="anioV">2024</span>
+      <button class="play" id="play" aria-label="Reproducir">▶</button>
+      <input type="range" id="anio" min="2015" max="2024" step="1" value="2024" aria-label="Año">
+    </div>
+    <div class="cifras" id="cifras"></div>
+  </section>
+
+  <section class="panel">
+    <div class="cab"><h2>Los dos lados del espejo</h2><p>Miles de millones de dólares. Lo que Costa Rica declara exportar contra lo que sus socios declaran haberle comprado. Tocá un año para elegirlo.</p></div>
+    <svg class="graf" id="total" viewBox="0 0 1000 300"></svg>
+    <div class="leyenda"><span><i style="background:var(--serie-1)"></i>Costa Rica declara</span><span><i style="background:var(--serie-2)"></i>Los socios declaran</span></div>
+  </section>
+
+  <section class="dos">
+    <div class="panel">
+      <div class="cab"><h2 id="tQuien">¿Quién explica la brecha?</h2><p>Brecha por socio en millones de dólares. Tocá una barra para ver la ficha del socio.</p></div>
+      <svg class="graf" id="quien" viewBox="0 0 520 420"></svg>
+    </div>
+    <div class="panel">
+      <div class="controles">
+        <label class="ctl" for="socio">Socio <select id="socio"></select></label>
+      </div>
+      <div class="cab"><h2 id="tSocio"></h2><p id="lectura"></p></div>
+      <svg class="graf" id="socioG" viewBox="0 0 520 250"></svg>
+      <div class="cifras" id="cifrasSocio" style="margin-top:12px;grid-template-columns:repeat(3,minmax(0,1fr))"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="cab"><h2>¿Ruido o estructura?</h2><p>Cada círculo es un socio con al menos 8 años de datos de los dos lados. Hacia la derecha, el socio declara más que Costa Rica; hacia abajo, la brecha cambia poco de un año a otro. Abajo y cerca del cero es lo normal; abajo y lejos del cero es estructural.</p></div>
+    <svg class="graf" id="disp" viewBox="0 0 1000 380"></svg>
+  </section>
+
+  <section class="panel">
+    <h2>Lo que la brecha no prueba</h2>
+    <div style="display:grid;gap:10px;margin-top:10px">
+      <p class="limite">Parte de la brecha es esperable: las importaciones se valoran <b>CIF</b> (con flete y seguro) y las exportaciones <b>FOB</b>. Eso explica algo del orden de 5 a 15 %, no un 600 %.</p>
+      <p class="limite">Una brecha grande no es evidencia de fraude. Es una pregunta: reexportación, atribución de origen o diferencias de clasificación. El análisis separa lo explicable de lo que no lo es.</p>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <span>Pablo Guerrero · Costa Rica</span>
+    <span>Fuente: UN COMTRADE. Solo países; el total mundial y los agregados regionales se excluyen para no contar dos veces, igual que en el análisis SQL del repositorio.</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+/*COMUN_JS*/
+const F = /*DATOS*/null.map(([anio, socio, cr, so]) => ({ anio, socio, cr, so, b: cr != null && so != null ? so - cr : null }));
+const AÑOS = [...new Set(F.map(f => f.anio))].sort();
+const TOT = AÑOS.map(a => {
+  const s = F.filter(f => f.anio === a);
+  const cr = d3.sum(s, f => f.cr || 0), so = d3.sum(s, f => f.so || 0);
+  return { anio: a, cr, so, b: so - cr, pc: (so / cr - 1) * 100 };
+});
+// Ficha por socio: brecha porcentual por año con los dos lados presentes.
+const SOCIOS = d3.groups(F.filter(f => f.b != null && f.cr > 0), f => f.socio).map(([socio, s]) => {
+  const pcs = s.map(f => (f.so / f.cr - 1) * 100);
+  return { socio, filas: s.sort((a, b) => a.anio - b.anio), n: s.length, media: d3.mean(pcs), desv: d3.deviation(pcs) || 0,
+           acum: d3.sum(s, f => f.b), crMedio: d3.mean(s, f => f.cr) };
+}).filter(s => s.n >= 8 && s.crMedio > 2e7).sort((a, b) => b.crMedio - a.crMedio);
+const estado = { anio: 2024, socio: "Estados Unidos" };
+
+d3.select("#socio").selectAll("option").data(SOCIOS).join("option").attr("value", s => s.socio).text(s => s.socio);
+d3.select("#socio").on("change", e => { estado.socio = e.target.value; pintar(); });
+reproductor(d3.select("#play"), d3.select("#anio"), a => { estado.anio = a; pintar(); });
+
+function cajas(id, items) {
+  d3.select(id).selectAll(".cifra").data(items).join(en => { const k = en.append("div").attr("class", "cifra"); k.append("span").attr("class", "v"); k.append("span").attr("class", "l"); return k; })
+    .call(k => { k.select(".v").text(d => d[0]); k.select(".l").text(d => d[1]); });
+}
+
+function total() {
+  const g = d3.select("#total"); g.selectAll("*").remove();
+  const W = ancho(), H = 300, m = { l: 48, r: W < 1000 ? 20 : 60, t: 18, b: 28 };
+  g.attr("viewBox", `0 0 ${W} ${H}`);
+  const x = d3.scaleLinear().domain(d3.extent(AÑOS)).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain([0, d3.max(TOT, t => t.so) / 1e9]).nice().range([H - m.b, m.t]);
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(5)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(v => "$" + num(v))).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(10).tickFormat(d3.format("d")).tickSize(0)).call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  // Área de la brecha entre las dos líneas
+  g.append("path").datum(TOT).attr("fill", css("--serie-2")).attr("fill-opacity", 0.12)
+    .attr("d", d3.area().x(t => x(t.anio)).y0(t => y(t.cr / 1e9)).y1(t => y(t.so / 1e9)));
+  g.append("line").attr("x1", x(estado.anio)).attr("x2", x(estado.anio)).attr("y1", m.t).attr("y2", H - m.b).attr("stroke", css("--linea")).attr("stroke-width", 2);
+  for (const [k, c] of [["cr", "--serie-1"], ["so", "--serie-2"]]) {
+    g.append("path").datum(TOT).attr("fill", "none").attr("stroke", css(c)).attr("stroke-width", 2.4).attr("d", d3.line().x(t => x(t.anio)).y(t => y(t[k] / 1e9)));
+    g.append("g").selectAll("circle").data(TOT).join("circle").attr("cx", t => x(t.anio)).attr("cy", t => y(t[k] / 1e9))
+      .attr("r", t => t.anio === estado.anio ? 5.5 : 3).attr("fill", css(c)).attr("stroke", css("--papel")).attr("stroke-width", 1.5);
+  }
+  g.append("g").selectAll("text").data(TOT).join("text").attr("class", "et-2").attr("text-anchor", "middle")
+    .attr("x", t => x(t.anio)).attr("y", t => y((t.so + t.cr) / 2e9) + 4)
+    .style("font-weight", t => t.anio === estado.anio ? 700 : 400).text(t => "+" + num(t.pc, 0) + (W < 1000 ? "%" : " %"));
+  g.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent").style("cursor", "pointer")
+    .on("pointermove", e => {
+      const t = TOT.find(t => t.anio === Math.round(x.invert(d3.pointer(e)[0])));
+      mostrarTip(e, String(t.anio), [["Costa Rica declara", usdM(t.cr)], ["Los socios declaran", usdM(t.so)], ["Brecha", usdM(t.b) + " · " + firmado(t.pc, 1) + " %"]]);
+    })
+    .on("pointerleave", ocultarTip)
+    .on("click", e => { estado.anio = Math.round(x.invert(d3.pointer(e)[0])); d3.select("#anio").property("value", estado.anio); pintar(); });
+}
+
+function quien() {
+  const g = d3.select("#quien"); g.selectAll("*").remove();
+  const t = TOT.find(t => t.anio === estado.anio);
+  const s = F.filter(f => f.anio === estado.anio && f.b != null);
+  const pos = s.filter(f => f.b > 0).sort((a, b) => b.b - a.b).slice(0, 9);
+  const neg = s.filter(f => f.b < 0).sort((a, b) => a.b - b.b).slice(0, 3);
+  const filas = pos.concat(neg.reverse());
+  const W = 520, H = 420, m = { l: 150, r: 110, t: 4, b: 4 };
+  const y = d3.scaleBand().domain(filas.map(f => f.socio)).range([m.t, H - m.b]).padding(0.22);
+  const ext = d3.max(filas, f => Math.abs(f.b));
+  const x = d3.scaleLinear().domain([Math.min(0, d3.min(filas, f => f.b)), ext]).range([m.l, W - m.r]);
+  const fila = g.selectAll("g").data(filas).join("g").attr("transform", f => `translate(0,${y(f.socio)})`).style("cursor", "pointer")
+    .on("click", (e, f) => { if (SOCIOS.some(s => s.socio === f.socio)) { estado.socio = f.socio; pintar(); } })
+    .on("pointermove", (e, f) => mostrarTip(e, f.socio, [["Costa Rica declara", usdM(f.cr)], ["El socio declara", usdM(f.so)], ["Brecha", usdM(f.b)], ["Aporte a la brecha del año", num(f.b / t.b * 100, 1) + " %"]]))
+    .on("pointerleave", ocultarTip);
+  fila.append("rect").attr("x", f => Math.min(x(0), x(f.b))).attr("width", f => Math.max(1, Math.abs(x(f.b) - x(0)))).attr("height", y.bandwidth()).attr("rx", 2)
+    .attr("fill", f => f.b >= 0 ? css("--serie-2") : css("--serie-1")).attr("stroke", f => f.socio === estado.socio ? css("--tinta") : "none").attr("stroke-width", 2);
+  fila.append("text").attr("class", "et").attr("x", m.l - 8).attr("y", y.bandwidth() / 2).attr("dy", "0.35em").attr("text-anchor", "end")
+    .style("font-weight", f => f.socio === estado.socio ? 700 : 400).text(f => f.socio.length > 20 ? f.socio.slice(0, 19) + "…" : f.socio);
+  fila.append("text").attr("class", "et-2").attr("x", f => Math.max(x(f.b), x(0)) + 6).attr("y", y.bandwidth() / 2).attr("dy", "0.35em")
+    .text(f => `${firmado(f.b / 1e6)} M · ${num(f.b / t.b * 100, 1)} %`);
+  g.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", H).attr("stroke", css("--tenue"));
+  const mitad = (() => { let acc = 0, n = 0; for (const f of s.sort((a, b) => b.b - a.b)) { acc += f.b; n++; if (acc >= t.b / 2) return n; } return n; })();
+  d3.select("#tQuien").text(`${mitad} socio${mitad > 1 ? "s" : ""} explica${mitad > 1 ? "n" : ""} la mitad de la brecha de ${estado.anio}`);
+}
+
+function lectura(s) {
+  if (s.media > 100) return "Brecha enorme: no la explican el flete ni el seguro. Hipótesis a contrastar: atribución de origen o reexportación desde zonas francas.";
+  if (s.media < -20 && s.desv <= 12) return "Brecha inversa y estable: Costa Rica declara sistemáticamente más de lo que el socio registra. Una brecha que se repite con poca variación es estructural, no un error.";
+  if (Math.abs(s.media) <= 25 && s.desv <= 15) return "Brecha moderada y estable: del orden que explican la valoración CIF contra FOB y los desfases de registro. Es la brecha «normal».";
+  if (s.desv > 40) return "Brecha inestable: cambia mucho de un año a otro, más compatible con errores de registro o de clasificación que con un fenómeno persistente.";
+  return "Brecha intermedia: mayor de lo que explica el flete, sin llegar a un patrón extremo.";
+}
+
+function socio() {
+  const s = SOCIOS.find(s => s.socio === estado.socio) || SOCIOS[0];
+  estado.socio = s.socio;
+  d3.select("#socio").property("value", s.socio);
+  d3.select("#tSocio").text(s.socio);
+  d3.select("#lectura").text(lectura(s));
+  const g = d3.select("#socioG"); g.selectAll("*").remove();
+  const W = 520, H = 250, m = { l: 52, r: 14, t: 12, b: 28 };
+  const x = d3.scaleLinear().domain(d3.extent(AÑOS)).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain([0, d3.max(s.filas, f => Math.max(f.cr, f.so))]).nice().range([H - m.b, m.t]);
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(4)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickFormat(usdM)).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(5).tickFormat(d3.format("d")).tickSize(0)).call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  for (const [k, c] of [["cr", "--serie-1"], ["so", "--serie-2"]]) {
+    g.append("path").datum(s.filas).attr("fill", "none").attr("stroke", css(c)).attr("stroke-width", 2.2).attr("d", d3.line().x(f => x(f.anio)).y(f => y(f[k])));
+    g.append("g").selectAll("circle").data(s.filas).join("circle").attr("cx", f => x(f.anio)).attr("cy", f => y(f[k])).attr("r", 3).attr("fill", css(c));
+  }
+  g.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("pointermove", e => {
+      const f = s.filas.find(f => f.anio === Math.round(x.invert(d3.pointer(e)[0])));
+      if (!f) return ocultarTip();
+      mostrarTip(e, `${s.socio} · ${f.anio}`, [["Costa Rica declara", usdM(f.cr)], ["El socio declara", usdM(f.so)], ["Brecha", firmado((f.so / f.cr - 1) * 100, 1) + " %"]]);
+    })
+    .on("pointerleave", ocultarTip);
+  cajas("#cifrasSocio", [
+    [firmado(s.media, 1) + " %", "brecha media"],
+    [num(s.desv, 1), "desviación (puntos)"],
+    [usdM(s.acum), `brecha acumulada (${s.n} años)`],
+  ]);
+}
+
+function dispersion() {
+  const g = d3.select("#disp"); g.selectAll("*").remove();
+  const W = ancho(), H = W < 1000 ? 420 : 380, m = { l: 52, r: 20, t: 14, b: 40 };
+  g.attr("viewBox", `0 0 ${W} ${H}`);
+  const x = d3.scaleSymlog().constant(20).domain([-100, d3.max(SOCIOS, s => s.media) * 1.1]).range([m.l, W - m.r]);
+  const y = d3.scaleSymlog().constant(10).domain([0, d3.max(SOCIOS, s => s.desv) * 1.1]).range([H - m.b, m.t]);
+  const r = d3.scaleSqrt().domain([0, d3.max(SOCIOS, s => s.crMedio)]).range([3, 30]);
+  const xt = (W < 1000 ? [-100, -20, 0, 20, 100, 1000] : [-100, -50, -20, 0, 20, 50, 100, 300, 1000]).filter(v => v <= x.domain()[1]);
+  const yt = [0, 5, 10, 25, 50, 100, 300].filter(v => v <= y.domain()[1]);
+  g.append("g").attr("class", "rejilla").selectAll("line").data(yt).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickValues(xt).tickSize(0).tickFormat(v => firmado(v) + "%")).call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).tickValues(yt).tickSize(0)).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", m.t).attr("y2", H - m.b).attr("stroke", css("--tenue")).attr("stroke-dasharray", "4 3");
+  g.append("text").attr("class", "et-2").attr("x", W - m.r).attr("y", H - 4).attr("text-anchor", "end").text("Brecha media, % (escala comprimida) →");
+  g.append("text").attr("class", "et-2").attr("x", m.l + 6).attr("y", m.t + 4).text("↑ Desviación de la brecha (puntos)");
+  g.append("g").selectAll("circle").data(SOCIOS.slice().sort((a, b) => b.crMedio - a.crMedio)).join("circle")
+    .attr("cx", s => x(s.media)).attr("cy", s => y(s.desv)).attr("r", s => r(s.crMedio))
+    .attr("fill", css("--serie-1")).attr("fill-opacity", s => s.socio === estado.socio ? 0.95 : 0.5)
+    .attr("stroke", s => s.socio === estado.socio ? css("--tinta") : css("--papel")).attr("stroke-width", s => s.socio === estado.socio ? 2.2 : 1)
+    .style("cursor", "pointer")
+    .on("pointermove", (e, s) => mostrarTip(e, s.socio, [["Brecha media", firmado(s.media, 1) + " %"], ["Desviación", num(s.desv, 1)], ["Costa Rica le declara (promedio)", usdM(s.crMedio)]]))
+    .on("pointerleave", ocultarTip)
+    .on("click", (e, s) => { estado.socio = s.socio; pintar(); document.getElementById("socio").scrollIntoView({ block: "center" }); });
+  const etiquetas = new Set(["Estados Unidos", "China", "Bélgica", "Países Bajos", estado.socio]);
+  g.append("g").selectAll("text").data(SOCIOS.filter(s => etiquetas.has(s.socio))).join("text").attr("class", "et").style("font-weight", 600)
+    .attr("x", s => x(s.media) + r(s.crMedio) * 0.75 + 4).attr("y", s => y(s.desv) - r(s.crMedio) * 0.6).text(s => s.socio).style("pointer-events", "none");
+}
+
+function pintar() {
+  d3.select("#anioV").text(estado.anio);
+  const t = TOT.find(t => t.anio === estado.anio);
+  cajas("#cifras", [
+    [usdM(t.cr), `declara Costa Rica en ${estado.anio}`],
+    [usdM(t.so), "declaran sus socios"],
+    [usdM(t.b), "de brecha"],
+    [firmado(t.pc, 1) + " %", "los socios declaran más"],
+  ]);
+  total(); quien(); socio(); dispersion();
+}
+pintar();
+alCambiarTema(pintar);
+alRedimensionar(pintar);
+</script>
+</body>
+</html>

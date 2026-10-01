@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nowcast del PIB · Pablo Guerrero</title>
+<meta name="description" content="Tablero interactivo: el nowcast del PIB trimestral de Costa Rica contra sus dos referentes, con el período elegible.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>/* Estilo común de los tableros. Mismos tokens que index.html del sitio. */
+:root{
+  --tinta:#12243a; --tinta-2:#2c415c; --azul:#1b4f8a; --ocre:#a8621a;
+  --fondo:#f4f5f6; --papel:#ffffff; --papel-2:#eceef0; --linea:#d7dade;
+  --texto:#1a1f26; --tenue:#5d666f; --radio:4px;
+  --serie-1:#1b4f8a; --serie-2:#c2611d; --serie-3:#6b7785; --serie-4:#2f8f6b;
+  --bien:#0ca30c; --mal:#d03b3b;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --tinta:#dfe6ee; --tinta-2:#a9bed6; --azul:#7fb3e8; --ocre:#e0995a;
+    --fondo:#0e1319; --papel:#161c24; --papel-2:#1e262f; --linea:#2c353f;
+    --texto:#e4e8ec; --tenue:#95a0ac;
+    --serie-1:#7fb3e8; --serie-2:#e0995a; --serie-3:#95a0ac; --serie-4:#5fc79e;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --tinta:#dfe6ee; --tinta-2:#a9bed6; --azul:#7fb3e8; --ocre:#e0995a;
+  --fondo:#0e1319; --papel:#161c24; --papel-2:#1e262f; --linea:#2c353f;
+  --texto:#e4e8ec; --tenue:#95a0ac;
+  --serie-1:#7fb3e8; --serie-2:#e0995a; --serie-3:#95a0ac; --serie-4:#5fc79e;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;padding:0 20px;background:var(--fondo);color:var(--texto);
+  font-family:"Public Sans",ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+.caja{max-width:1100px;margin:0 auto;padding-block:28px 56px;display:grid;gap:26px;}
+a{color:var(--azul);text-decoration:none;border-bottom:1px solid transparent;}
+a:hover{border-bottom-color:var(--azul);}
+:focus-visible{outline:2px solid var(--ocre);outline-offset:2px;}
+.volver{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.06em;}
+header.top{display:grid;gap:10px;padding-bottom:22px;border-bottom:3px double var(--tinta);}
+.kicker{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ocre);margin:0;}
+h1{font-family:"Newsreader",Georgia,serif;font-weight:500;font-size:clamp(30px,5vw,46px);line-height:1.06;letter-spacing:-.02em;margin:0;color:var(--tinta);text-wrap:balance;max-width:24ch;}
+h2{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:22px;margin:0;color:var(--tinta);text-wrap:balance;}
+h3{font-size:15px;font-weight:600;margin:0;color:var(--tinta);}
+p{margin:0;}
+.lede{font-size:17px;max-width:66ch;}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--tenue);}
+.panel{background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:18px;min-width:0;}
+.cab{display:grid;gap:4px;margin-bottom:12px;}
+.cab p{color:var(--tenue);font-size:14px;max-width:70ch;}
+.cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--linea);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;}
+.cifra{background:var(--papel);padding:14px 16px;display:grid;gap:2px;min-width:0;}
+.cifra .v{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:24px;font-weight:500;color:var(--ocre);font-variant-numeric:tabular-nums;line-height:1.2;}
+.cifra .l{font-size:12.5px;color:var(--tenue);}
+@media (max-width:760px){.cifras{grid-template-columns:repeat(2,minmax(0,1fr));}.cifra .v{font-size:20px;}}
+.dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;}
+@media (max-width:900px){.dos{grid-template-columns:minmax(0,1fr);}}
+.controles{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px;}
+.seg{display:inline-flex;border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;}
+.seg button{border:0;border-right:1px solid var(--linea);background:var(--papel);color:var(--texto);padding:5px 11px;font:inherit;font-size:13px;cursor:pointer;}
+.seg button:last-child{border-right:0;}
+.seg button[aria-pressed="true"]{background:var(--tinta);color:var(--papel);}
+label.ctl{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--tenue);}
+select,input[type=search]{font:inherit;font-size:13.5px;color:var(--texto);background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:5px 9px;max-width:100%;}
+input[type=range]{accent-color:var(--ocre);flex:1 1 180px;min-width:0;}
+.anio{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:26px;font-weight:500;color:var(--tinta);font-variant-numeric:tabular-nums;min-width:64px;}
+.play{border:1px solid var(--linea);background:var(--papel);color:var(--texto);border-radius:var(--radio);width:34px;height:30px;cursor:pointer;font-size:13px;}
+svg.graf{width:100%;height:auto;display:block;overflow:visible;}
+.eje text{fill:var(--tenue);font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;}
+.eje line,.eje path{stroke:var(--linea);}
+.rejilla line{stroke:var(--linea);stroke-dasharray:2 3;}
+.et{fill:var(--texto);font-size:12px;}
+.et-2{fill:var(--tenue);font-size:11.5px;font-variant-numeric:tabular-nums;}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--tenue);margin-top:8px;}
+.leyenda i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px;}
+.nota{font-size:12.5px;color:var(--tenue);margin-top:8px;max-width:75ch;}
+.limite{font-size:13.5px;color:var(--tenue);border-left:2px solid var(--linea);padding-left:12px;}
+.limite b{color:var(--ocre);font-weight:600;}
+.tip{position:fixed;pointer-events:none;background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:8px 10px;font-size:12.5px;box-shadow:0 6px 18px rgb(0 0 0/.14);min-width:160px;z-index:10;}
+.tip b{display:block;font-family:"Newsreader",Georgia,serif;font-size:15px;margin-bottom:2px;}
+.tip .f{display:flex;justify-content:space-between;gap:14px;color:var(--tenue);}
+.tip .f span:last-child{color:var(--texto);font-variant-numeric:tabular-nums;}
+footer.pie{display:grid;gap:4px;font-size:12.5px;color:var(--tenue);border-top:1px solid var(--linea);padding-top:14px;}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important;}}
+</style>
+</head>
+<body>
+<div class="caja">
+  <a class="volver" href="../">← Pablo Guerrero</a>
+  <header class="top">
+    <p class="kicker">Nowcasting del PIB · Costa Rica · 2015–2026</p>
+    <h1>El referente ingenuo es difícil de vencer, y casi nadie lo reporta</h1>
+    <p class="lede">El modelo estima el crecimiento trimestral del PIB antes de la cifra oficial, con indicadores de coyuntura de la OCDE. Elegí el período y mirá cómo cambia su ventaja frente a cada referente.</p>
+    <div class="meta"><span>Datos: OCDE y BCCR</span><span><a href="https://github.com/pabloguerrerocr/portfolio-data-analytics">Código y metodología →</a></span></div>
+  </header>
+
+  <section class="cifras" id="cifras" aria-label="Resultado del período elegido"></section>
+
+  <section class="panel">
+    <div class="controles">
+      <label class="ctl" for="desde">Desde <select id="desde"></select></label>
+      <label class="ctl" for="hasta">Hasta <select id="hasta"></select></label>
+      <label class="ctl" for="sin2020"><input type="checkbox" id="sin2020"> Excluir 2020</label>
+    </div>
+    <div class="cab">
+      <h2>Crecimiento trimestral del PIB: observado y estimado</h2>
+      <p>Variación trimestral en %. El nowcast se compara contra repetir el trimestre anterior (el referente fácil) y contra el promedio histórico (el exigente).</p>
+    </div>
+    <svg class="graf" id="lineas" viewBox="0 0 1000 380" role="img" aria-label="Serie trimestral observada, nowcast y referentes"></svg>
+    <div class="leyenda" id="leyenda"></div>
+  </section>
+
+  <section class="panel">
+    <div class="controles">
+      <span class="ctl">Comparar contra</span>
+      <div class="seg" id="refSeg" role="group" aria-label="Referente"></div>
+    </div>
+    <div class="cab">
+      <h2 id="tituloGana">¿En qué trimestres gana el modelo?</h2>
+      <p>Error absoluto del nowcast menos error absoluto del referente, en puntos porcentuales. Barra hacia abajo: el modelo erró menos.</p>
+    </div>
+    <svg class="graf" id="barras" viewBox="0 0 1000 260" role="img" aria-label="Diferencia de error por trimestre"></svg>
+  </section>
+
+  <section class="panel">
+    <h2>Lo que el modelo no hace</h2>
+    <div style="display:grid;gap:10px;margin-top:10px">
+      <p class="limite">En 2020-T2 el PIB cayó <b>8,3 %</b> y el nowcast predijo <b>+0,4 %</b>. No anticipa quiebres y no pretende hacerlo.</p>
+      <p class="limite">Toda la señal viene de una variable: la <b>producción manufacturera</b> (t = 3,53). El R² es <b>0,154</b>: el modelo explica poco, y eso también es un resultado.</p>
+      <p class="limite">La mejora se mide con la raíz del error cuadrático medio (RMSE). Con pocos trimestres por período, cambia mucho con uno solo.</p>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <span>Pablo Guerrero · Costa Rica</span>
+    <span>Fuente: indicadores de coyuntura de la OCDE y PIB trimestral del BCCR. Resultados del repositorio portfolio-data-analytics.</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+// Utilidades comunes de los tableros: formato en español (coma decimal),
+// tooltip y colores leídos de las variables CSS para respetar el tema.
+const nf = (d) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d });
+const num = (v, d = 0) => nf(d).format(v);
+const firmado = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + nf(d).format(Math.abs(v));
+const usdM = v => {
+  const a = Math.abs(v), s = v < 0 ? "−" : "";
+  if (a >= 1e9) return s + "$" + nf(a >= 1e10 ? 1 : 2).format(a / 1e9) + " mm";
+  if (a >= 1e6) return s + "$" + nf(0).format(a / 1e6) + " M";
+  return s + "$" + nf(0).format(a / 1e3) + " mil";
+};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+const tip = d3.select("body").append("div").attr("class", "tip").attr("hidden", true);
+function mostrarTip(e, titulo, filas) {
+  tip.attr("hidden", null).html(`<b>${titulo}</b>` + filas.map(f => `<div class="f"><span>${f[0]}</span><span>${f[1]}</span></div>`).join(""));
+  const t = tip.node();
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + t.offsetWidth > innerWidth - 8) x = e.clientX - t.offsetWidth - 14;
+  if (y + t.offsetHeight > innerHeight - 8) y = e.clientY - t.offsetHeight - 14;
+  tip.style("left", Math.max(4, x) + "px").style("top", Math.max(4, y) + "px");
+}
+const ocultarTip = () => tip.attr("hidden", true);
+
+// Repinta cuando cambia el tema del sistema o el atributo data-theme.
+function alCambiarTema(fn) {
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", fn);
+  new MutationObserver(fn).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+
+// Gráficos anchos: en pantallas angostas se dibujan con menos ancho lógico
+// para que el texto no quede diminuto al escalar el SVG.
+const ancho = (normal = 1000) => innerWidth < 700 ? 560 : normal;
+function alRedimensionar(fn) {
+  let t, ultimo = ancho();
+  addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { if (ancho() !== ultimo) { ultimo = ancho(); fn(); } }, 150); });
+}
+
+// Botón de reproducción para un deslizador de años.
+function reproductor(boton, deslizador, alCambiar) {
+  let timer = null;
+  const parar = () => { clearInterval(timer); timer = null; boton.text("▶").attr("aria-label", "Reproducir"); };
+  boton.on("click", () => {
+    if (timer) return parar();
+    const n = deslizador.node();
+    if (+n.value >= +n.max) n.value = n.min;
+    boton.text("❚❚").attr("aria-label", "Pausar");
+    timer = setInterval(() => {
+      if (+n.value >= +n.max) return parar();
+      n.value = +n.value + 1; alCambiar(+n.value);
+    }, 700);
+  });
+  deslizador.on("input", e => { parar(); alCambiar(+e.target.value); });
+}
+
+const DATOS = [["2015Q1",0.143,0.833,1.09,1.031],["2015Q2",2.174,1.031,0.143,1.016],["2015Q3",1.221,0.892,2.174,1.035],["2015Q4",-0.397,1.242,1.221,1.038],["2016Q1",2.426,1.068,-0.397,1.016],["2016Q2",-0.369,1.097,2.426,1.038],["2016Q3",1.76,1.058,-0.369,1.016],["2016Q4",1.031,0.959,1.76,1.027],["2017Q1",0.513,0.965,1.031,1.027],["2017Q2",2.232,1.231,0.513,1.02],["2017Q3",-0.059,1.1,2.232,1.037],["2017Q4",1.554,0.93,-0.059,1.022],["2018Q1",0.696,1.125,1.554,1.029],["2018Q2",1.009,0.921,0.696,1.025],["2018Q3",-0.321,1.011,1.009,1.024],["2018Q4",-0.625,0.836,-0.321,1.006],["2019Q1",1.707,1.082,-0.625,0.984],["2019Q2",1.405,1.198,1.707,0.994],["2019Q3",0.27,0.8,1.405,0.999],["2019Q4",0.495,1.111,0.27,0.99],["2020Q1",0.095,1.118,0.495,0.984],["2020Q2",-8.325,0.434,0.095,0.972],["2020Q3",1.133,2.261,-8.325,0.858],["2020Q4",2.742,1.836,1.133,0.861],["2021Q1",4.22,1.225,2.742,0.884],["2021Q2",2.229,1.424,4.22,0.923],["2021Q3",3.213,1.023,2.229,0.939],["2021Q4",0.784,0.902,3.213,0.965],["2022Q1",0.927,0.953,0.784,0.963],["2022Q2",0.662,0.663,0.927,0.963],["2022Q3",1.443,1.806,0.662,0.959],["2022Q4",2.031,1.062,1.443,0.965],["2023Q1",0.426,0.59,2.031,0.976],["2023Q2",1.634,1.611,0.426,0.97],["2023Q3",0.96,0.681,1.634,0.978],["2023Q4",0.831,1.4,0.96,0.977],["2024Q1",1.06,1.362,0.831,0.976],["2024Q2",1.142,0.673,1.06,0.977],["2024Q3",0.541,1.563,1.142,0.978],["2024Q4",1.304,1.298,0.541,0.974],["2025Q1",0.514,1.188,1.304,0.977],["2025Q2",2.563,1.588,0.514,0.973],["2025Q3",0.773,0.524,2.563,0.988],["2025Q4",0.442,0.564,0.773,0.986],["2026Q1",0.127,0.966,0.442,0.981],["2026Q2",1.167,0.912,0.127,0.973]];
+const Q = DATOS.map(([t, obs, now, ing, prom]) => ({ t, obs, now, ing, prom, y: +t.slice(0, 4) }));
+const SERIES = [
+  { k: "obs", nombre: "Observado", color: "--tinta", ancho: 2.2 },
+  { k: "now", nombre: "Nowcast", color: "--serie-1", ancho: 2.2 },
+  { k: "ing", nombre: "Repetir el trimestre anterior", color: "--serie-2", ancho: 1.6, guion: "5 4" },
+  { k: "prom", nombre: "Promedio histórico", color: "--serie-3", ancho: 1.6, guion: "2 3" },
+];
+const REFS = { ing: "a repetir el trimestre anterior", prom: "al promedio histórico" };
+const estado = { desde: Q[0].t, hasta: Q[Q.length - 1].t, sin2020: false, ref: "prom", visibles: new Set(["obs", "now", "ing", "prom"]) };
+
+const idx = t => Q.findIndex(q => q.t === t);
+const enPeriodo = q => idx(q.t) >= idx(estado.desde) && idx(q.t) <= idx(estado.hasta) && !(estado.sin2020 && q.y === 2020);
+const rmse = (s, k) => Math.sqrt(d3.mean(s, q => (q.obs - q[k]) ** 2));
+
+for (const id of ["desde", "hasta"]) {
+  d3.select("#" + id).selectAll("option").data(Q).join("option").attr("value", q => q.t).text(q => q.t.replace("Q", "-T"));
+  d3.select("#" + id).property("value", estado[id]).on("change", e => {
+    estado[id] = e.target.value;
+    if (idx(estado.desde) > idx(estado.hasta) - 3) {
+      if (id === "desde") estado.hasta = Q[Math.min(Q.length - 1, idx(estado.desde) + 3)].t;
+      else estado.desde = Q[Math.max(0, idx(estado.hasta) - 3)].t;
+    }
+    pintar();
+  });
+}
+d3.select("#sin2020").on("change", e => { estado.sin2020 = e.target.checked; pintar(); });
+d3.select("#refSeg").selectAll("button").data(Object.entries(REFS)).join("button")
+  .text(d => d[0] === "ing" ? "Trimestre anterior" : "Promedio histórico")
+  .on("click", (e, d) => { estado.ref = d[0]; pintar(); });
+
+function cifras(s) {
+  const r = rmse(s, "now");
+  const items = [
+    [firmado((1 - r / rmse(s, "ing")) * 100, 1) + " %", "menos error que repetir el trimestre anterior"],
+    [firmado((1 - r / rmse(s, "prom")) * 100, 1) + " %", "menos error que el promedio histórico"],
+    [num(r, 2) + " pp", "error típico del nowcast (RMSE)"],
+    [String(s.length), "trimestres en el período"],
+  ];
+  d3.select("#cifras").selectAll(".cifra").data(items).join(en => { const c = en.append("div").attr("class", "cifra"); c.append("span").attr("class", "v"); c.append("span").attr("class", "l"); return c; })
+    .call(c => { c.select(".v").text(d => d[0]); c.select(".l").text(d => d[1]); });
+}
+
+function lineas(s) {
+  const g = d3.select("#lineas"); g.selectAll("*").remove();
+  const W = ancho(), H = W < 1000 ? 330 : 380, m = { l: 44, r: 14, t: 10, b: 30 };
+  g.attr("viewBox", `0 0 ${W} ${H}`);
+  const x = d3.scalePoint().domain(Q.map(q => q.t)).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain(d3.extent(Q.flatMap(q => [q.obs, q.now, q.ing, q.prom]))).nice().range([H - m.b, m.t]);
+  // Trimestres fuera del período: sombreados
+  const paso = x.step();
+  g.append("g").selectAll("rect").data(Q.filter(q => !enPeriodo(q))).join("rect")
+    .attr("x", q => x(q.t) - paso / 2).attr("width", paso).attr("y", m.t).attr("height", H - m.b - m.t)
+    .attr("fill", css("--papel-2"));
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(6)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", css("--tenue"));
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(6).tickSize(0).tickFormat(v => num(v))).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`)
+    .call(d3.axisBottom(x).tickValues(Q.filter(q => q.t.endsWith("Q1") && (W >= 1000 || +q.t.slice(0, 4) % 2 === 1)).map(q => q.t)).tickFormat(t => t.slice(0, 4)).tickSize(0))
+    .call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  for (const s0 of SERIES.slice().reverse()) {
+    if (!estado.visibles.has(s0.k)) continue;
+    g.append("path").datum(Q).attr("fill", "none").attr("stroke", css(s0.color)).attr("stroke-width", s0.ancho)
+      .attr("stroke-dasharray", s0.guion || null).attr("stroke-linejoin", "round")
+      .attr("d", d3.line().x(q => x(q.t)).y(q => y(q[s0.k])));
+  }
+  const q2 = Q.find(q => q.t === "2020Q2");
+  if (estado.visibles.has("obs")) g.append("text").attr("class", "et-2").attr("x", x(q2.t) + 8).attr("y", y(q2.obs) + 4).text(W < 1000 ? "2020-T2: −8,3 %" : "2020-T2: −8,3 % observado, +0,4 % estimado");
+  // Cursor y tooltip
+  const cursor = g.append("line").attr("y1", m.t).attr("y2", H - m.b).attr("stroke", css("--tenue")).attr("hidden", true);
+  g.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("pointermove", e => {
+      const [px] = d3.pointer(e), i = Math.max(0, Math.min(Q.length - 1, Math.round((px - m.l) / paso))), q = Q[i];
+      cursor.attr("hidden", null).attr("x1", x(q.t)).attr("x2", x(q.t));
+      mostrarTip(e, q.t.replace("Q", "-T") + (enPeriodo(q) ? "" : " (fuera del período)"), SERIES.map(s0 => [s0.nombre, firmado(q[s0.k], 2) + " %"]));
+    })
+    .on("pointerleave", () => { cursor.attr("hidden", true); ocultarTip(); });
+
+  d3.select("#leyenda").selectAll("label").data(SERIES).join("label").attr("class", "ctl")
+    .html(s0 => `<input type="checkbox" ${estado.visibles.has(s0.k) ? "checked" : ""} ${s0.k === "obs" || s0.k === "now" ? "disabled" : ""}><i style="background:${css(s0.color)}"></i>${s0.nombre}`)
+    .on("change", (e, s0) => { e.target.checked ? estado.visibles.add(s0.k) : estado.visibles.delete(s0.k); lineas(Q.filter(enPeriodo)); });
+}
+
+function barras(s) {
+  const g = d3.select("#barras"); g.selectAll("*").remove();
+  const W = ancho(), H = 260, m = { l: 44, r: 14, t: 10, b: 30 };
+  g.attr("viewBox", `0 0 ${W} ${H}`);
+  const d = s.map(q => ({ q, v: Math.abs(q.obs - q.now) - Math.abs(q.obs - q[estado.ref]) }));
+  const x = d3.scaleBand().domain(s.map(q => q.t)).range([m.l, W - m.r]).padding(0.2);
+  const ext = d3.max(d, e => Math.abs(e.v)) || 1;
+  const y = d3.scaleLinear().domain([-ext, ext]).nice().range([H - m.b, m.t]);
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(4)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickFormat(v => firmado(v, 1))).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`)
+    .call(d3.axisBottom(x).tickValues(s.filter(q => q.t.endsWith("Q1") && (W >= 1000 || +q.t.slice(0, 4) % 2 === 1)).map(q => q.t)).tickFormat(t => t.slice(0, 4)).tickSize(0))
+    .call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  g.append("g").selectAll("rect").data(d).join("rect")
+    .attr("x", e => x(e.q.t)).attr("width", x.bandwidth()).attr("rx", 2)
+    .attr("y", e => Math.min(y(0), y(e.v))).attr("height", e => Math.max(1, Math.abs(y(e.v) - y(0))))
+    .attr("fill", e => e.v <= 0 ? css("--serie-1") : css("--serie-2"))
+    .on("pointermove", (ev, e) => mostrarTip(ev, e.q.t.replace("Q", "-T"), [["Error del nowcast", num(Math.abs(e.q.obs - e.q.now), 2) + " pp"], ["Error del referente", num(Math.abs(e.q.obs - e.q[estado.ref]), 2) + " pp"], [e.v <= 0 ? "Gana el modelo por" : "Gana el referente por", num(Math.abs(e.v), 2) + " pp"]]))
+    .on("pointerleave", ocultarTip);
+  g.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", css("--tenue"));
+  const gana = d.filter(e => e.v < 0).length;
+  d3.select("#tituloGana").text(`El modelo le gana ${REFS[estado.ref]} en ${gana} de ${d.length} trimestres`);
+}
+
+function pintar() {
+  d3.select("#desde").property("value", estado.desde);
+  d3.select("#hasta").property("value", estado.hasta);
+  d3.select("#refSeg").selectAll("button").attr("aria-pressed", d => String(d[0] === estado.ref));
+  const s = Q.filter(enPeriodo);
+  cifras(s); lineas(s); barras(s);
+}
+pintar();
+alCambiarTema(pintar);
+alRedimensionar(pintar);
+</script>
+</body>
+</html>

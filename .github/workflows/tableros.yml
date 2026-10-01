@@ -1,0 +1,34 @@
+# Rearma los tableros con los datos publicados en cada repositorio.
+# Corre el día 6 de cada mes (un día después de que se actualizan los
+# indicadores económicos del atlas) y a mano desde la pestaña Actions.
+name: Tableros
+
+on:
+  schedule:
+    - cron: "41 7 6 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rearmar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas requests
+      - run: python tableros/construir.py
+      - name: Guardar si cambió
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add nowcast comercio brecha atlas
+          if git diff --cached --quiet; then
+            echo "Sin cambios."
+          else
+            git commit -m "Actualizar tableros ($(date -u +%Y-%m-%d))"
+            git push
+          fi

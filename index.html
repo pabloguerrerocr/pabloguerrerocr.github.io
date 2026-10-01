@@ -202,7 +202,18 @@
     display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
   }
 
+  /* ---- tableros ---- */
+  .tableros{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+  a.tablero{display:grid;align-content:start;background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;color:var(--texto);transition:border-color .15s, transform .15s;}
+  a.tablero:hover{border-color:var(--azul);transform:translateY(-2px);}
+  .tablero img{display:block;width:100%;height:auto;aspect-ratio:8/5;object-fit:cover;object-position:top;border-bottom:1px solid var(--linea);background:var(--papel-2);}
+  .tablero .txt{padding:14px 16px 16px;display:grid;gap:4px;}
+  .tablero h3{margin:0;font-size:15.5px;font-weight:600;color:var(--tinta);}
+  .tablero p{margin:0;font-size:14px;color:var(--tenue);line-height:1.5;}
+  .tablero .ir{font-family:"JetBrains Mono", ui-monospace, monospace;font-size:11.5px;color:var(--ocre);margin-top:6px;}
+
   @media (max-width: 620px){
+    .tableros{grid-template-columns:1fr;}
     .hallazgo{grid-template-columns:1fr;gap:10px;}
     .cifra small{display:inline;margin-left:10px;}
     .ficha th{width:auto;display:block;padding-bottom:2px;border-bottom:none;}
@@ -227,6 +238,45 @@
   </header>
 
   <section>
+    <h2>Tableros interactivos</h2>
+    <p class="lead">Los datos de cada hallazgo, para explorarlos en vez de leerlos.</p>
+    <div class="tableros">
+      <a class="tablero" href="atlas/">
+        <img src="tableros/img/atlas.png" alt="Mapa mundial coloreado por cambio anual de la población, con la ficha de un país" loading="lazy" width="720" height="450">
+        <div class="txt">
+          <h3>Atlas de población y economía 2026</h3>
+          <p>234 países y 18 indicadores del Banco Mundial y el FMI, con filtros, ficha por país y un simulador. Los datos económicos se actualizan solos cada mes.</p>
+          <span class="ir">Explorar el atlas →</span>
+        </div>
+      </a>
+      <a class="tablero" href="brecha/">
+        <img src="tableros/img/brecha.png" alt="Lo que Costa Rica declara exportar contra lo que declaran sus socios, 2015–2024" loading="lazy" width="720" height="450">
+        <div class="txt">
+          <h3>La brecha espejo, socio por socio</h3>
+          <p>Diez años de lo que Costa Rica declara contra lo que declaran sus socios, con una ficha que clasifica cada brecha como ruido o estructura.</p>
+          <span class="ir">Explorar la brecha →</span>
+        </div>
+      </a>
+      <a class="tablero" href="comercio/">
+        <img src="tableros/img/comercio.png" alt="Destinos y productos de exportación de Costa Rica en 2024" loading="lazy" width="720" height="450">
+        <div class="txt">
+          <h3>Cómo se concentró el comercio exterior</h3>
+          <p>Destinos, productos y concentración año por año, de 2010 a 2024, con exportaciones e importaciones.</p>
+          <span class="ir">Explorar el comercio →</span>
+        </div>
+      </a>
+      <a class="tablero" href="nowcast/">
+        <img src="tableros/img/nowcast.png" alt="Crecimiento trimestral del PIB observado contra el nowcast y sus referentes" loading="lazy" width="720" height="450">
+        <div class="txt">
+          <h3>El nowcast contra sus dos referentes</h3>
+          <p>Elegí el período o excluí 2020 y mirá cómo cambia la ventaja del modelo frente a cada referente.</p>
+          <span class="ir">Explorar el nowcast →</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section>
     <h2>Hallazgos</h2>
     <p class="lead">Investigación propia sobre datos públicos, reproducible de punta a punta.</p>
 
@@ -246,7 +296,7 @@
         <h3>Costa Rica y sus socios no reportan el mismo comercio</h3>
         <p>Costa Rica declara exportar <b>19,9 mil millones de dólares</b>; sus socios declaran importar <b>34,0 mil millones</b>. Diez años de brecha sostenida, y tres socios explican la mitad — cada uno por una razón distinta.</p>
         <p class="limite"><b>Límite declarado:</b> parte de la brecha es esperable por valoración FOB frente a CIF y por reexportación. El análisis separa lo explicable de lo que no lo es.</p>
-        <p class="fuente">Estadísticas espejo · COMTRADE y BCCR</p>
+        <p class="fuente">Estadísticas espejo · COMTRADE y BCCR · <a href="brecha/">Explorar los datos →</a></p>
       </div>
     </div>
 
@@ -255,7 +305,7 @@
       <div>
         <h3>El comercio se concentró en vez de diversificarse</h3>
         <p>El índice de Herfindahl de destinos de exportación pasó de <b>0,160 a 0,248</b> en la década. Un solo capítulo arancelario explica el <b>70,5 %</b> del aumento, lo que convierte la diversificación declarada en una concentración medible.</p>
-        <p class="fuente">Comercio exterior · datos oficiales</p>
+        <p class="fuente">Comercio exterior · datos oficiales · <a href="comercio/">Explorar los datos →</a></p>
       </div>
     </div>
 
@@ -265,7 +315,7 @@
         <h3>El referente ingenuo es difícil de vencer, y casi nadie lo reporta</h3>
         <p>Nowcast del PIB trimestral: <b>30,6 %</b> de mejora sobre el referente ingenuo y <b>6,5 %</b> sobre el promedio histórico, que es el exigente. La señal está en producción manufacturera (t = 3,53).</p>
         <p class="limite"><b>Límite declarado:</b> R² de 0,154 y el modelo no anticipa quiebres. Lo declaro porque un resultado que no sobrevive al escrutinio es un hallazgo, no un fracaso que esconder.</p>
-        <p class="fuente">Nowcasting · datos OCDE</p>
+        <p class="fuente">Nowcasting · datos OCDE · <a href="nowcast/">Explorar los datos →</a></p>
       </div>
     </div>
 
@@ -308,6 +358,21 @@
         <h3><a href="https://github.com/pabloguerrerocr/comercio-exterior-cr">comercio-exterior-cr</a></h3>
         <p>Concentración de destinos y de capítulos arancelarios en la década, con el aporte de cada componente al cambio total.</p>
         <p class="tags">Herfindahl · descomposición</p>
+      </div>
+      <div class="repo">
+        <h3><a href="https://github.com/pabloguerrerocr/portfolio-data-analytics">portfolio-data-analytics</a></h3>
+        <p>Nowcast del PIB trimestral evaluado contra dos referentes, y el atlas de población y economía, cuyos indicadores del Banco Mundial y el FMI se actualizan solos cada mes con GitHub Actions.</p>
+        <p class="tags">Nowcasting · GitHub Actions · D3</p>
+      </div>
+      <div class="repo">
+        <h3><a href="https://github.com/pabloguerrerocr/contaflow">contaflow</a></h3>
+        <p>Cierre contable mensual a partir de los comprobantes electrónicos de Hacienda: entra una carpeta de XML y sale el Excel que firma el cliente y el número del Formulario 150. En la demo automatiza el <b>94 %</b> de las líneas, y lo que no reconoce lo manda a revisión en vez de adivinar. El diario tiene que cuadrar a <b>0,00</b>.</p>
+        <p class="tags">Python · partida doble · facturación electrónica</p>
+      </div>
+      <div class="repo">
+        <h3><a href="https://github.com/pabloguerrerocr/backtester-mt5">backtester-mt5</a></h3>
+        <p>Auditoría de backtests: cuánto del retorno sobrevive a costos, sobreajuste y look-ahead. Cinco modelos populares de «smart money» con las reglas de sus autores: <b>0 de 25</b> combinaciones modelo × mercado tienen ventaja después de costos, y entre <b>1.120 variantes</b> lo que ganaba antes no predice lo que gana después.</p>
+        <p class="tags">Python · validación fuera de muestra · 44 pruebas</p>
       </div>
     </div>
   </section>

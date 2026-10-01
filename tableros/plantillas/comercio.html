@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comercio exterior de Costa Rica · Pablo Guerrero</title>
+<meta name="description" content="Tablero interactivo: cómo se concentraron los destinos y productos de exportación de Costa Rica entre 2010 y 2024.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>/*COMUN_CSS*/</style>
+</head>
+<body>
+<div class="caja">
+  <a class="volver" href="../">← Pablo Guerrero</a>
+  <header class="top">
+    <p class="kicker">Comercio exterior · Costa Rica · 2010–2024</p>
+    <h1>El comercio exterior de Costa Rica se concentró, no se diversificó</h1>
+    <p class="lede">Las exportaciones se duplicaron con creces y al mismo tiempo dependen más de un país y de un producto. Mové el año o tocá ▶ para ver cómo pasó.</p>
+    <div class="meta"><span>Datos: UN COMTRADE</span><span><a href="https://github.com/pabloguerrerocr/comercio-exterior-cr">Código y metodología →</a></span></div>
+  </header>
+
+  <section class="panel" style="display:grid;gap:14px">
+    <div class="controles" style="margin:0">
+      <span class="anio" id="anioV">2024</span>
+      <button class="play" id="play" aria-label="Reproducir">▶</button>
+      <input type="range" id="anio" min="2010" max="2024" step="1" value="2024" aria-label="Año">
+      <div class="seg" id="flujoSeg" role="group" aria-label="Flujo"></div>
+    </div>
+    <div class="cifras" id="cifras"></div>
+  </section>
+
+  <section class="dos">
+    <div class="panel">
+      <div class="cab"><h2 id="tSocios">¿A dónde van las exportaciones?</h2><p>Los 12 mayores socios del año y el resto.</p></div>
+      <svg class="graf" id="socios" viewBox="0 0 520 440"></svg>
+    </div>
+    <div class="panel">
+      <div class="cab"><h2 id="tCap">¿Qué se exporta?</h2><p>Capítulos del sistema armonizado.</p></div>
+      <svg class="graf" id="capitulos" viewBox="0 0 520 440"></svg>
+    </div>
+  </section>
+
+  <section class="dos">
+    <div class="panel">
+      <div class="controles"><div class="seg" id="concSeg" role="group" aria-label="Medida de concentración"></div></div>
+      <div class="cab"><h2 id="tConc">Concentración de los destinos de exportación</h2><p id="pConc"></p></div>
+      <svg class="graf" id="conc" viewBox="0 0 520 300"></svg>
+    </div>
+    <div class="panel">
+      <div class="cab"><h2>Exportaciones e importaciones</h2><p>Miles de millones de dólares. La brecha entre las dos líneas es el déficit comercial de bienes.</p></div>
+      <svg class="graf" id="balanza" viewBox="0 0 520 300"></svg>
+      <div class="leyenda"><span><i style="background:var(--serie-1)"></i>Exportaciones</span><span><i style="background:var(--serie-2)"></i>Importaciones</span></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="cab"><h2>Quién explica el aumento exportador de 2010 a 2024</h2><p>Aporte de cada capítulo al aumento total de las exportaciones.</p></div>
+    <svg class="graf" id="aporte" viewBox="0 0 1000 300"></svg>
+    <p class="limite" style="margin-top:12px">Los valores son los que declara Costa Rica. Sus socios declaran importar bastante más: esa diferencia es el tema de <a href="../brecha/">la brecha espejo</a>.</p>
+  </section>
+
+  <footer class="pie">
+    <span>Pablo Guerrero · Costa Rica</span>
+    <span>Fuente: UN COMTRADE, comercio de bienes de Costa Rica declarado por Costa Rica. Valores en dólares corrientes.</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+/*COMUN_JS*/
+const D = /*DATOS*/null;
+const AÑOS = D.balanza.map(f => f[0]);
+const FLUJOS = { Exp: "Exportaciones", Imp: "Importaciones" };
+const CONC = {
+  hhi: { i: 1, nombre: "Herfindahl", fmt: v => num(v, 3), texto: "Índice de Herfindahl-Hirschman de destinos: 0 es comercio repartido entre muchos socios, 1 es un solo socio." },
+  top1: { i: 2, nombre: "Estados Unidos", fmt: v => num(v, 1) + " %", texto: "Porcentaje de las exportaciones que va a Estados Unidos, el mayor destino." },
+  top4: { i: 3, nombre: "4 destinos", fmt: v => num(v, 1) + " %", texto: "Porcentaje que se llevan los cuatro mayores destinos." },
+  top10: { i: 4, nombre: "10 destinos", fmt: v => num(v, 1) + " %", texto: "Porcentaje que se llevan los diez mayores destinos." },
+};
+const DESTACA = new Set(["Estados Unidos", "Instrumentos médicos y de precisión"]);
+const estado = { anio: 2024, flujo: "Exp", conc: "hhi" };
+
+d3.select("#flujoSeg").selectAll("button").data(Object.entries(FLUJOS)).join("button").text(d => d[1])
+  .on("click", (e, d) => { estado.flujo = d[0]; pintar(); });
+d3.select("#concSeg").selectAll("button").data(Object.entries(CONC)).join("button").text(d => d[1].nombre)
+  .on("click", (e, d) => { estado.conc = d[0]; pintar(); });
+reproductor(d3.select("#play"), d3.select("#anio"), a => { estado.anio = a; pintar(); });
+
+const delAño = (filas) => filas.filter(f => f[0] === estado.anio && f[1] === estado.flujo).map(f => ({ n: f[2], v: f[3] }));
+
+function cifras() {
+  const b = D.balanza.find(f => f[0] === estado.anio), c = D.conc.find(f => f[0] === estado.anio);
+  const caps = delAño(D.capitulos.map(f => f)), tot = d3.sum(caps, d => d.v);
+  const med = caps.find(d => d.n === "Instrumentos médicos y de precisión");
+  const items = estado.flujo === "Exp" ? [
+    ["$" + num(b[1], 1) + " mm", `exportado en ${estado.anio}`],
+    [num(c[2], 1) + " %", "va a Estados Unidos"],
+    [num(c[1], 3), "Herfindahl de destinos"],
+    [med ? num(med.v / tot * 100, 1) + " %" : "—", "son instrumentos médicos y de precisión"],
+  ] : [
+    ["$" + num(b[2], 1) + " mm", `importado en ${estado.anio}`],
+    [firmado(b[3], 1) + " mm", "saldo comercial de bienes"],
+    [num(b[1] / b[2] * 100, 0) + " %", "de las importaciones se cubre con exportaciones"],
+    (() => { const so = delAño(D.socios), t = d3.sum(so, d => d.v), top = so.filter(d => d.n !== "Resto").sort((a, b) => b.v - a.v)[0];
+             return [num(top.v / t * 100, 1) + " %", `de lo importado viene de ${top.n}`]; })(),
+  ];
+  d3.select("#cifras").selectAll(".cifra").data(items).join(en => { const k = en.append("div").attr("class", "cifra"); k.append("span").attr("class", "v"); k.append("span").attr("class", "l"); return k; })
+    .call(k => { k.select(".v").text(d => d[0]); k.select(".l").text(d => d[1]); });
+}
+
+function barrasH(id, filas) {
+  const g = d3.select(id); g.selectAll("*").remove();
+  const W = 520, H = 440, m = { l: 168, r: 112, t: 4, b: 4 };
+  const tot = d3.sum(filas, d => d.v);
+  const orden = filas.filter(d => d.n !== "Resto").sort((a, b) => b.v - a.v).concat(filas.filter(d => d.n === "Resto"));
+  const y = d3.scaleBand().domain(orden.map(d => d.n)).range([m.t, H - m.b]).padding(0.22);
+  const max = d3.max(D[id === "#socios" ? "socios" : "capitulos"].filter(f => f[1] === estado.flujo && f[2] !== "Resto"), f => f[3]);
+  const x = d3.scaleLinear().domain([0, Math.max(max, d3.max(orden, d => d.v))]).range([m.l, W - m.r]);
+  const fila = g.selectAll("g").data(orden).join("g").attr("transform", d => `translate(0,${y(d.n)})`);
+  fila.append("rect").attr("x", m.l).attr("height", y.bandwidth()).attr("rx", 2)
+    .attr("width", d => Math.max(1, x(d.v) - m.l))
+    .attr("fill", d => d.n === "Resto" ? css("--serie-3") : DESTACA.has(d.n) ? css("--ocre") : css("--serie-1"))
+    .attr("fill-opacity", d => d.n === "Resto" ? 0.45 : 0.9);
+  fila.append("text").attr("class", "et").attr("x", m.l - 8).attr("y", y.bandwidth() / 2).attr("dy", "0.35em").attr("text-anchor", "end")
+    .text(d => d.n.length > 26 ? d.n.slice(0, 25) + "…" : d.n);
+  fila.append("text").attr("class", "et-2").attr("x", d => x(d.v) + 6).attr("y", y.bandwidth() / 2).attr("dy", "0.35em")
+    .text(d => `${usdM(d.v)} · ${num(d.v / tot * 100, 1)} %`);
+  fila.append("rect").attr("x", 0).attr("width", W).attr("height", y.bandwidth()).attr("fill", "transparent")
+    .on("pointermove", (e, d) => mostrarTip(e, d.n, [["Valor", usdM(d.v)], ["Del total del año", num(d.v / tot * 100, 1) + " %"]]))
+    .on("pointerleave", ocultarTip);
+}
+
+function serieAnual(id, series, fmt, dominio) {
+  const g = d3.select(id); g.selectAll("*").remove();
+  const W = 520, H = 300, m = { l: 48, r: 16, t: 12, b: 28 };
+  const x = d3.scaleLinear().domain(d3.extent(AÑOS)).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain(dominio || [0, d3.max(series.flatMap(s => s.d.map(p => p[1])))]).nice().range([H - m.b, m.t]);
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(5)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmt)).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(7).tickFormat(d3.format("d")).tickSize(0)).call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  g.append("line").attr("x1", x(estado.anio)).attr("x2", x(estado.anio)).attr("y1", m.t).attr("y2", H - m.b).attr("stroke", css("--linea")).attr("stroke-width", 2);
+  for (const s of series) {
+    g.append("path").datum(s.d).attr("fill", "none").attr("stroke", css(s.color)).attr("stroke-width", 2.2).attr("d", d3.line().x(p => x(p[0])).y(p => y(p[1])));
+    const p = s.d.find(p => p[0] === estado.anio);
+    g.append("circle").attr("cx", x(p[0])).attr("cy", y(p[1])).attr("r", 5).attr("fill", css(s.color)).attr("stroke", css("--papel")).attr("stroke-width", 2);
+    g.append("text").attr("class", "et").style("font-weight", 600).attr("x", x(p[0]) + (p[0] > 2020 ? -8 : 8)).attr("y", y(p[1]) - 10)
+      .attr("text-anchor", p[0] > 2020 ? "end" : "start").text(fmt(p[1]));
+  }
+  g.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("pointermove", e => {
+      const a = Math.round(x.invert(d3.pointer(e)[0]));
+      mostrarTip(e, String(a), series.map(s => [s.nombre, fmt(s.d.find(p => p[0] === a)[1])]));
+    })
+    .on("pointerleave", ocultarTip)
+    .on("click", e => { const a = Math.round(x.invert(d3.pointer(e)[0])); estado.anio = a; d3.select("#anio").property("value", a); pintar(); });
+}
+
+function aporte() {
+  const g = d3.select("#aporte"); g.selectAll("*").remove();
+  const W = ancho(), H = 300, m = { l: W < 1000 ? 200 : 290, r: 120, t: 4, b: 4 };
+  g.attr("viewBox", `0 0 ${W} ${H}`);
+  const y = d3.scaleBand().domain(D.aporte.map(d => d[0])).range([m.t, H - m.b]).padding(0.25);
+  const x = d3.scaleLinear().domain([0, d3.max(D.aporte, d => d[2])]).range([m.l, W - m.r]);
+  const f = g.selectAll("g").data(D.aporte).join("g").attr("transform", d => `translate(0,${y(d[0])})`);
+  f.append("rect").attr("x", m.l).attr("height", y.bandwidth()).attr("rx", 2).attr("width", d => Math.max(1, x(d[2]) - m.l))
+    .attr("fill", d => DESTACA.has(d[0]) ? css("--ocre") : css("--serie-1"));
+  f.append("text").attr("class", "et").attr("x", m.l - 8).attr("y", y.bandwidth() / 2).attr("dy", "0.35em").attr("text-anchor", "end").text(d => d[0].length > (W < 1000 ? 28 : 40) ? d[0].slice(0, W < 1000 ? 27 : 39) + "…" : d[0]);
+  f.append("text").attr("class", "et-2").attr("x", d => x(d[2]) + 6).attr("y", y.bandwidth() / 2).attr("dy", "0.35em").text(d => `${num(d[2], 1)} % · ${firmado(d[1] / 1e6, 0)} M`);
+}
+
+function pintar() {
+  d3.select("#anioV").text(estado.anio);
+  d3.select("#flujoSeg").selectAll("button").attr("aria-pressed", d => String(d[0] === estado.flujo));
+  d3.select("#concSeg").selectAll("button").attr("aria-pressed", d => String(d[0] === estado.conc));
+  const exp = estado.flujo === "Exp";
+  d3.select("#tSocios").text(exp ? `¿A dónde van las exportaciones en ${estado.anio}?` : `¿De dónde vienen las importaciones en ${estado.anio}?`);
+  d3.select("#tCap").text(exp ? `¿Qué se exporta en ${estado.anio}?` : `¿Qué se importa en ${estado.anio}?`);
+  cifras();
+  barrasH("#socios", delAño(D.socios));
+  barrasH("#capitulos", delAño(D.capitulos));
+  const c = CONC[estado.conc];
+  d3.select("#pConc").text(c.texto);
+  serieAnual("#conc", [{ nombre: c.nombre, color: "--ocre", d: D.conc.map(f => [f[0], f[c.i]]) }], c.fmt,
+    estado.conc === "hhi" ? [0, 0.3] : [0, 100]);
+  serieAnual("#balanza", [
+    { nombre: "Exportaciones", color: "--serie-1", d: D.balanza.map(f => [f[0], f[1]]) },
+    { nombre: "Importaciones", color: "--serie-2", d: D.balanza.map(f => [f[0], f[2]]) },
+  ], v => "$" + num(v, 0));
+  aporte();
+}
+pintar();
+alCambiarTema(pintar);
+alRedimensionar(pintar);
+</script>
+</body>
+</html>
