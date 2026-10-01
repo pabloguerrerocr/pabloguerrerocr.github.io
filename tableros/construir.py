@@ -169,10 +169,10 @@ if __name__ == "__main__":
     nowcast()
     comercio()
     brecha()
-    tfg()
-    try:
-        atlas()
-    except (requests.HTTPError, FileNotFoundError) as e:
-        # El atlas vive en otro repositorio; si todavía no está publicado en
-        # main, se conserva la copia actual en vez de romper los demás.
-        print(f"atlas: se conserva la copia actual ({e})")
+    # El atlas y el TFG viven en otros repositorios; si una fuente no está
+    # disponible, se conserva la copia actual en vez de romper los demás.
+    for armar in (tfg, atlas):
+        try:
+            armar()
+        except (requests.HTTPError, FileNotFoundError) as e:
+            print(f"{armar.__name__}: se conserva la copia actual ({e})")
