@@ -9,6 +9,7 @@ cada tablero necesita y los incrusta en una página autocontenida:
     comercio/index.html  comercio-exterior-cr
     brecha/index.html    brecha-espejo-cr
     atlas/index.html     portfolio-data-analytics  (poblacion-mundial/web)
+    tfg/index.html       sector-externo-cr-eeuu    (salidas/tablas 14 y 15)
 
 Con FUENTE_LOCAL=/ruta/a/los/clones lee de copias locales en vez de GitHub.
 Un flujo de GitHub Actions lo corre cada mes, así los tableros siguen a los
@@ -130,6 +131,20 @@ def brecha():
     escribir("brecha", filas)
 
 
+# ------------------------------------------------------------------ tfg
+def tfg():
+    repo = "sector-externo-cr-eeuu"
+    irf = csv(repo, "salidas/tablas/14_irf_bandas.csv")
+    fevd = csv(repo, "salidas/tablas/15_fevd_especificaciones.csv")
+    datos = {
+        "irf": irf[["respuesta", "impulso", "horizonte", "efecto", "inferior", "superior"]]
+               .round(6).values.tolist(),
+        "fevd": fevd[["bloque", "especificacion", "variable", "horizonte",
+                      "canal_real_pc", "canal_financiero_pc"]].round(3).values.tolist(),
+    }
+    escribir("tfg", datos)
+
+
 # ------------------------------------------------------------------ atlas
 def atlas():
     html = fuente("portfolio-data-analytics", "poblacion-mundial/web/index.html").decode("utf-8")
@@ -154,6 +169,7 @@ if __name__ == "__main__":
     nowcast()
     comercio()
     brecha()
+    tfg()
     try:
         atlas()
     except (requests.HTTPError, FileNotFoundError) as e:

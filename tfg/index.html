@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EE. UU. y el sector externo de Costa Rica · Pablo Guerrero</title>
+<meta name="description" content="Tablero interactivo del TFG: cuánto del sector externo de Costa Rica explican el ciclo real y la tasa de la Fed, con tres identificaciones y bandas bootstrap.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>/* Estilo común de los tableros. Mismos tokens que index.html del sitio. */
+:root{
+  --tinta:#12243a; --tinta-2:#2c415c; --azul:#1b4f8a; --ocre:#a8621a;
+  --fondo:#f4f5f6; --papel:#ffffff; --papel-2:#eceef0; --linea:#d7dade;
+  --texto:#1a1f26; --tenue:#5d666f; --radio:4px;
+  --serie-1:#1b4f8a; --serie-2:#c2611d; --serie-3:#6b7785; --serie-4:#2f8f6b;
+  --bien:#0ca30c; --mal:#d03b3b;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --tinta:#dfe6ee; --tinta-2:#a9bed6; --azul:#7fb3e8; --ocre:#e0995a;
+    --fondo:#0e1319; --papel:#161c24; --papel-2:#1e262f; --linea:#2c353f;
+    --texto:#e4e8ec; --tenue:#95a0ac;
+    --serie-1:#7fb3e8; --serie-2:#e0995a; --serie-3:#95a0ac; --serie-4:#5fc79e;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --tinta:#dfe6ee; --tinta-2:#a9bed6; --azul:#7fb3e8; --ocre:#e0995a;
+  --fondo:#0e1319; --papel:#161c24; --papel-2:#1e262f; --linea:#2c353f;
+  --texto:#e4e8ec; --tenue:#95a0ac;
+  --serie-1:#7fb3e8; --serie-2:#e0995a; --serie-3:#95a0ac; --serie-4:#5fc79e;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;padding:0 20px;background:var(--fondo);color:var(--texto);
+  font-family:"Public Sans",ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+.caja{max-width:1100px;margin:0 auto;padding-block:28px 56px;display:grid;gap:26px;}
+a{color:var(--azul);text-decoration:none;border-bottom:1px solid transparent;}
+a:hover{border-bottom-color:var(--azul);}
+:focus-visible{outline:2px solid var(--ocre);outline-offset:2px;}
+.volver{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.06em;}
+header.top{display:grid;gap:10px;padding-bottom:22px;border-bottom:3px double var(--tinta);}
+.kicker{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ocre);margin:0;}
+h1{font-family:"Newsreader",Georgia,serif;font-weight:500;font-size:clamp(30px,5vw,46px);line-height:1.06;letter-spacing:-.02em;margin:0;color:var(--tinta);text-wrap:balance;max-width:24ch;}
+h2{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:22px;margin:0;color:var(--tinta);text-wrap:balance;}
+h3{font-size:15px;font-weight:600;margin:0;color:var(--tinta);}
+p{margin:0;}
+.lede{font-size:17px;max-width:66ch;}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--tenue);}
+.panel{background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:18px;min-width:0;}
+.cab{display:grid;gap:4px;margin-bottom:12px;}
+.cab p{color:var(--tenue);font-size:14px;max-width:70ch;}
+.cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--linea);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;}
+.cifra{background:var(--papel);padding:14px 16px;display:grid;gap:2px;min-width:0;}
+.cifra .v{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:24px;font-weight:500;color:var(--ocre);font-variant-numeric:tabular-nums;line-height:1.2;}
+.cifra .l{font-size:12.5px;color:var(--tenue);}
+@media (max-width:760px){.cifras{grid-template-columns:repeat(2,minmax(0,1fr));}.cifra .v{font-size:20px;}}
+.dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;}
+@media (max-width:900px){.dos{grid-template-columns:minmax(0,1fr);}}
+.controles{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px;}
+.seg{display:inline-flex;border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;}
+.seg button{border:0;border-right:1px solid var(--linea);background:var(--papel);color:var(--texto);padding:5px 11px;font:inherit;font-size:13px;cursor:pointer;}
+.seg button:last-child{border-right:0;}
+.seg button[aria-pressed="true"]{background:var(--tinta);color:var(--papel);}
+label.ctl{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--tenue);}
+select,input[type=search]{font:inherit;font-size:13.5px;color:var(--texto);background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:5px 9px;max-width:100%;}
+input[type=range]{accent-color:var(--ocre);flex:1 1 180px;min-width:0;}
+.anio{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:26px;font-weight:500;color:var(--tinta);font-variant-numeric:tabular-nums;min-width:64px;}
+.play{border:1px solid var(--linea);background:var(--papel);color:var(--texto);border-radius:var(--radio);width:34px;height:30px;cursor:pointer;font-size:13px;}
+svg.graf{width:100%;height:auto;display:block;overflow:visible;}
+.eje text{fill:var(--tenue);font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;}
+.eje line,.eje path{stroke:var(--linea);}
+.rejilla line{stroke:var(--linea);stroke-dasharray:2 3;}
+.et{fill:var(--texto);font-size:12px;}
+.et-2{fill:var(--tenue);font-size:11.5px;font-variant-numeric:tabular-nums;}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--tenue);margin-top:8px;}
+.leyenda i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px;}
+.nota{font-size:12.5px;color:var(--tenue);margin-top:8px;max-width:75ch;}
+.limite{font-size:13.5px;color:var(--tenue);border-left:2px solid var(--linea);padding-left:12px;}
+.limite b{color:var(--ocre);font-weight:600;}
+.tip{position:fixed;pointer-events:none;background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:8px 10px;font-size:12.5px;box-shadow:0 6px 18px rgb(0 0 0/.14);min-width:160px;z-index:10;}
+.tip b{display:block;font-family:"Newsreader",Georgia,serif;font-size:15px;margin-bottom:2px;}
+.tip .f{display:flex;justify-content:space-between;gap:14px;color:var(--tenue);}
+.tip .f span:last-child{color:var(--texto);font-variant-numeric:tabular-nums;}
+footer.pie{display:grid;gap:4px;font-size:12.5px;color:var(--tenue);border-top:1px solid var(--linea);padding-top:14px;}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important;}}
+
+.tabla{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;}
+.tabla th,.tabla td{padding:9px 10px;border-bottom:1px solid var(--linea);text-align:left;}
+.tabla td:last-child,.tabla th:last-child{text-align:right;}
+.tabla th{font-size:12px;color:var(--tenue);font-weight:600;}
+.tabla tr.fuerte td{font-weight:600;color:var(--tinta);}
+</style>
+</head>
+<body>
+<div class="caja">
+  <a class="volver" href="../">← Pablo Guerrero</a>
+  <header class="top">
+    <p class="kicker">Trabajo Final de Graduación · VAR/VECM · 2015–2025</p>
+    <h1>Sobre el sector externo de Costa Rica, la tasa de la Fed pesa más que el ciclo de Estados Unidos</h1>
+    <p class="lede">Estados Unidos afecta a una economía pequeña y abierta por dos canales: su ciclo económico mueve la demanda de exportaciones (canal real) y la tasa de la Reserva Federal mueve los flujos de capital (canal financiero). Elegí una variable de Costa Rica y una forma de identificar los choques, y mirá cuánto explica cada canal.</p>
+    <div class="meta"><span>Datos: FRED y BCCR</span><span><a href="https://github.com/pabloguerrerocr/sector-externo-cr-eeuu">Código y metodología →</a></span><span><a href="resumen.pdf">Resumen en PDF (2 páginas) →</a></span></div>
+  </header>
+
+  <section class="cifras" id="cifras"></section>
+
+  <section class="panel">
+    <div class="controles">
+      <label class="ctl" for="variable">Variable <select id="variable"></select></label>
+      <div class="seg" id="espSeg" role="group" aria-label="Identificación de los choques"></div>
+    </div>
+    <div class="cab"><h2 id="tFevd"></h2><p id="pEsp"></p></div>
+    <svg class="graf" id="fevd" viewBox="0 0 1000 320" role="img" aria-label="Porcentaje de la varianza explicado por cada canal según el horizonte"></svg>
+    <div class="leyenda"><span><i style="background:var(--serie-2)"></i>Canal financiero (tasa de la Fed)</span><span><i style="background:var(--serie-1)"></i>Canal real (ciclo de EE. UU.)</span></div>
+  </section>
+
+  <section class="dos">
+    <div class="panel">
+      <div class="cab"><h2>Respuesta a un alza de la Fed</h2><p id="pIrf1"></p></div>
+      <svg class="graf" id="irfFin" viewBox="0 0 520 280"></svg>
+    </div>
+    <div class="panel">
+      <div class="cab"><h2>Respuesta a un auge del ciclo de EE. UU.</h2><p id="pIrf2"></p></div>
+      <svg class="graf" id="irfReal" viewBox="0 0 520 280"></svg>
+    </div>
+  </section>
+  <p class="nota" style="margin-top:-14px">Choque de una desviación estándar, identificado con Cholesky. La banda es el intervalo Monte Carlo al 95 % (500 réplicas). Donde la banda cruza el cero, el efecto no se distingue de cero, y eso también es un resultado.</p>
+
+  <section class="panel">
+    <div class="cab"><h2>¿Depende del orden de las variables?</h2><p>La descomposición de Cholesky depende del orden. La conclusión se probó con todos los órdenes que respetan «EE. UU. antes que Costa Rica» y con la descomposición generalizada, que no depende del orden.</p></div>
+    <table class="tabla" id="robustez">
+      <thead><tr><th>Identificación</th><th>Domina el canal financiero</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="nota">Invertir las variables de Costa Rica no mueve ningún porcentaje: con Cholesky, la parte que explican los choques de EE. UU. no depende del orden de las variables que van después. La prueba que importa es poner la Fed antes que el ciclo real. Ahí solo cambian las exportaciones, que ya eran casi un empate.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Límites declarados</h2>
+    <div style="display:grid;gap:10px;margin-top:10px">
+      <p class="limite">Hay <b>autocorrelación remanente</b> en los tres bloques (Portmanteau, p = 0,0004; 0,0063 y 0,0252). Las bandas se leen con cautela.</p>
+      <p class="limite"><b>Las reservas suben tras un alza de la Fed</b>, al revés de la historia clásica de fuga de capitales. Casi seguro refleja la acumulación de reservas de 2022–2024: es una correlación de ese período, no una ley general.</p>
+      <p class="limite">El bloque de balanza de pagos tiene <b>44 observaciones</b> trimestrales. Sus resultados son indicativos y se reportan solo hasta 12 trimestres.</p>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <span>Pablo Guerrero · Costa Rica</span>
+    <span>Fuente: FRED (producción industrial, PIB, tasa de fondos federales) y BCCR (exportaciones, ITCER, reservas, tasa de política, balanza de pagos). Trabajo Final de Graduación, Licenciatura en Economía, Universidad Latina de Costa Rica.</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+// Utilidades comunes de los tableros: formato en español (coma decimal),
+// tooltip y colores leídos de las variables CSS para respetar el tema.
+const nf = (d) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d });
+const num = (v, d = 0) => nf(d).format(v);
+const firmado = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + nf(d).format(Math.abs(v));
+const usdM = v => {
+  const a = Math.abs(v), s = v < 0 ? "−" : "";
+  if (a >= 1e9) return s + "$" + nf(a >= 1e10 ? 1 : 2).format(a / 1e9) + " mm";
+  if (a >= 1e6) return s + "$" + nf(0).format(a / 1e6) + " M";
+  return s + "$" + nf(0).format(a / 1e3) + " mil";
+};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+const tip = d3.select("body").append("div").attr("class", "tip").attr("hidden", true);
+function mostrarTip(e, titulo, filas) {
+  tip.attr("hidden", null).html(`<b>${titulo}</b>` + filas.map(f => `<div class="f"><span>${f[0]}</span><span>${f[1]}</span></div>`).join(""));
+  const t = tip.node();
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + t.offsetWidth > innerWidth - 8) x = e.clientX - t.offsetWidth - 14;
+  if (y + t.offsetHeight > innerHeight - 8) y = e.clientY - t.offsetHeight - 14;
+  tip.style("left", Math.max(4, x) + "px").style("top", Math.max(4, y) + "px");
+}
+const ocultarTip = () => tip.attr("hidden", true);
+
+// Repinta cuando cambia el tema del sistema o el atributo data-theme.
+function alCambiarTema(fn) {
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", fn);
+  new MutationObserver(fn).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+
+// Gráficos anchos: en pantallas angostas se dibujan con menos ancho lógico
+// para que el texto no quede diminuto al escalar el SVG.
+const ancho = (normal = 1000) => innerWidth < 700 ? 560 : normal;
+function alRedimensionar(fn) {
+  let t, ultimo = ancho();
+  addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { if (ancho() !== ultimo) { ultimo = ancho(); fn(); } }, 150); });
+}
+
+// Botón de reproducción para un deslizador de años.
+function reproductor(boton, deslizador, alCambiar) {
+  let timer = null;
+  const parar = () => { clearInterval(timer); timer = null; boton.text("▶").attr("aria-label", "Reproducir"); };
+  boton.on("click", () => {
+    if (timer) return parar();
+    const n = deslizador.node();
+    if (+n.value >= +n.max) n.value = n.min;
+    boton.text("❚❚").attr("aria-label", "Pausar");
+    timer = setInterval(() => {
+      if (+n.value >= +n.max) return parar();
+      n.value = +n.value + 1; alCambiar(+n.value);
+    }, 700);
+  });
+  deslizador.on("input", e => { parar(); alCambiar(+e.target.value); });
+}
+
+const D = {"irf":[["log_export_cr","log_ipi_eeuu",0,0.007262,-0.007609,0.02257],["log_export_cr","log_ipi_eeuu",1,0.000208,-0.017258,0.016473],["log_export_cr","log_ipi_eeuu",2,-0.001398,-0.017552,0.016111],["log_export_cr","log_ipi_eeuu",3,-0.00479,-0.022255,0.015175],["log_export_cr","log_ipi_eeuu",4,-0.010528,-0.0294,0.010945],["log_export_cr","log_ipi_eeuu",5,-0.011627,-0.029003,0.005163],["log_export_cr","log_ipi_eeuu",6,-0.010478,-0.02464,0.006455],["log_export_cr","log_ipi_eeuu",7,-0.011015,-0.023849,0.005701],["log_export_cr","log_ipi_eeuu",8,-0.012091,-0.02492,0.005024],["log_export_cr","log_ipi_eeuu",9,-0.012401,-0.024228,0.004322],["log_export_cr","log_ipi_eeuu",10,-0.012459,-0.02432,0.004506],["log_export_cr","log_ipi_eeuu",11,-0.012603,-0.024766,0.004498],["log_export_cr","log_ipi_eeuu",12,-0.012684,-0.02495,0.004042],["log_export_cr","log_ipi_eeuu",13,-0.012689,-0.025009,0.004314],["log_export_cr","log_ipi_eeuu",14,-0.012673,-0.025108,0.004477],["log_export_cr","log_ipi_eeuu",15,-0.012612,-0.024409,0.004483],["log_export_cr","log_ipi_eeuu",16,-0.012502,-0.024388,0.004689],["log_export_cr","log_ipi_eeuu",17,-0.012367,-0.023244,0.004753],["log_export_cr","log_ipi_eeuu",18,-0.012213,-0.023066,0.004686],["log_export_cr","log_ipi_eeuu",19,-0.012034,-0.022876,0.004557],["log_export_cr","log_ipi_eeuu",20,-0.011835,-0.022915,0.004598],["log_export_cr","log_ipi_eeuu",21,-0.011622,-0.022339,0.004621],["log_export_cr","log_ipi_eeuu",22,-0.011396,-0.02214,0.004841],["log_export_cr","log_ipi_eeuu",23,-0.01116,-0.021576,0.004853],["log_export_cr","log_ipi_eeuu",24,-0.010916,-0.021114,0.004897],["log_export_cr","ffr",0,-0.013623,-0.028848,0.001633],["log_export_cr","ffr",1,0.004241,-0.014328,0.022603],["log_export_cr","ffr",2,0.011872,-0.004287,0.026205],["log_export_cr","ffr",3,0.007089,-0.008548,0.023738],["log_export_cr","ffr",4,0.00681,-0.01038,0.02387],["log_export_cr","ffr",5,0.009729,-0.00905,0.026318],["log_export_cr","ffr",6,0.011383,-0.007099,0.028585],["log_export_cr","ffr",7,0.012624,-0.006646,0.030801],["log_export_cr","ffr",8,0.013957,-0.006714,0.032217],["log_export_cr","ffr",9,0.014825,-0.00649,0.033079],["log_export_cr","ffr",10,0.015445,-0.006571,0.03392],["log_export_cr","ffr",11,0.016079,-0.007628,0.034798],["log_export_cr","ffr",12,0.016558,-0.00785,0.035438],["log_export_cr","ffr",13,0.016813,-0.009031,0.035723],["log_export_cr","ffr",14,0.016946,-0.009617,0.036069],["log_export_cr","ffr",15,0.01699,-0.010532,0.036398],["log_export_cr","ffr",16,0.01693,-0.011516,0.036102],["log_export_cr","ffr",17,0.016778,-0.013066,0.035353],["log_export_cr","ffr",18,0.016553,-0.013618,0.034273],["log_export_cr","ffr",19,0.016263,-0.014077,0.033527],["log_export_cr","ffr",20,0.015916,-0.014479,0.032794],["log_export_cr","ffr",21,0.015524,-0.01514,0.032074],["log_export_cr","ffr",22,0.015095,-0.015754,0.031662],["log_export_cr","ffr",23,0.014634,-0.016313,0.030961],["log_export_cr","ffr",24,0.014149,-0.018136,0.030541],["log_itcer","log_ipi_eeuu",0,0.000805,-0.001365,0.00281],["log_itcer","log_ipi_eeuu",1,0.00221,-0.001464,0.005271],["log_itcer","log_ipi_eeuu",2,0.002436,-0.002088,0.006205],["log_itcer","log_ipi_eeuu",3,0.001754,-0.003749,0.006143],["log_itcer","log_ipi_eeuu",4,0.001311,-0.004593,0.00656],["log_itcer","log_ipi_eeuu",5,0.001557,-0.005003,0.007111],["log_itcer","log_ipi_eeuu",6,0.001987,-0.004191,0.006846],["log_itcer","log_ipi_eeuu",7,0.00226,-0.003731,0.007502],["log_itcer","log_ipi_eeuu",8,0.002441,-0.003597,0.007704],["log_itcer","log_ipi_eeuu",9,0.002617,-0.003425,0.008089],["log_itcer","log_ipi_eeuu",10,0.002785,-0.003314,0.008599],["log_itcer","log_ipi_eeuu",11,0.002923,-0.003177,0.00904],["log_itcer","log_ipi_eeuu",12,0.003026,-0.002983,0.008874],["log_itcer","log_ipi_eeuu",13,0.003094,-0.002598,0.008948],["log_itcer","log_ipi_eeuu",14,0.003134,-0.002516,0.009161],["log_itcer","log_ipi_eeuu",15,0.003151,-0.002498,0.008901],["log_itcer","log_ipi_eeuu",16,0.003146,-0.002288,0.00862],["log_itcer","log_ipi_eeuu",17,0.00312,-0.002167,0.008435],["log_itcer","log_ipi_eeuu",18,0.003076,-0.002171,0.008119],["log_itcer","log_ipi_eeuu",19,0.003016,-0.002208,0.008138],["log_itcer","log_ipi_eeuu",20,0.002943,-0.002138,0.008161],["log_itcer","log_ipi_eeuu",21,0.002858,-0.00207,0.008129],["log_itcer","log_ipi_eeuu",22,0.002763,-0.002024,0.007845],["log_itcer","log_ipi_eeuu",23,0.00266,-0.001867,0.007506],["log_itcer","log_ipi_eeuu",24,0.002551,-0.0019,0.007129],["log_itcer","ffr",0,0.000329,-0.001936,0.002219],["log_itcer","ffr",1,0.001391,-0.001958,0.004522],["log_itcer","ffr",2,-9.8e-05,-0.004194,0.003547],["log_itcer","ffr",3,-0.002311,-0.006712,0.001996],["log_itcer","ffr",4,-0.00432,-0.009244,0.000707],["log_itcer","ffr",5,-0.005769,-0.010968,-0.000332],["log_itcer","ffr",6,-0.006861,-0.012027,-0.000977],["log_itcer","ffr",7,-0.007728,-0.013082,-0.001558],["log_itcer","ffr",8,-0.008465,-0.013755,-0.001891],["log_itcer","ffr",9,-0.009078,-0.014334,-0.002093],["log_itcer","ffr",10,-0.009542,-0.014772,-0.002042],["log_itcer","ffr",11,-0.009865,-0.015369,-0.001861],["log_itcer","ffr",12,-0.010079,-0.015744,-0.001686],["log_itcer","ffr",13,-0.010198,-0.015714,-0.001273],["log_itcer","ffr",14,-0.010227,-0.015789,-0.000762],["log_itcer","ffr",15,-0.010176,-0.016187,-0.000527],["log_itcer","ffr",16,-0.010053,-0.016021,-0.000288],["log_itcer","ffr",17,-0.009867,-0.015922,9.7e-05],["log_itcer","ffr",18,-0.009628,-0.015751,0.000439],["log_itcer","ffr",19,-0.009342,-0.01516,0.000755],["log_itcer","ffr",20,-0.009016,-0.01449,0.001103],["log_itcer","ffr",21,-0.008658,-0.014216,0.001483],["log_itcer","ffr",22,-0.008273,-0.014011,0.001623],["log_itcer","ffr",23,-0.007868,-0.013709,0.001877],["log_itcer","ffr",24,-0.007447,-0.013402,0.002113],["log_reservas","log_ipi_eeuu",0,-0.002065,-0.010069,0.006088],["log_reservas","log_ipi_eeuu",1,-0.004222,-0.01483,0.007173],["log_reservas","log_ipi_eeuu",2,-0.006197,-0.016795,0.006297],["log_reservas","log_ipi_eeuu",3,-0.005436,-0.016794,0.009359],["log_reservas","log_ipi_eeuu",4,-0.003472,-0.01727,0.012053],["log_reservas","log_ipi_eeuu",5,-0.003509,-0.017497,0.011687],["log_reservas","log_ipi_eeuu",6,-0.004874,-0.018742,0.010202],["log_reservas","log_ipi_eeuu",7,-0.005848,-0.020041,0.009098],["log_reservas","log_ipi_eeuu",8,-0.006146,-0.019797,0.008663],["log_reservas","log_ipi_eeuu",9,-0.006254,-0.020322,0.009107],["log_reservas","log_ipi_eeuu",10,-0.0065,-0.021035,0.00955],["log_reservas","log_ipi_eeuu",11,-0.006914,-0.021918,0.009307],["log_reservas","log_ipi_eeuu",12,-0.00739,-0.022958,0.009098],["log_reservas","log_ipi_eeuu",13,-0.007833,-0.02375,0.009345],["log_reservas","log_ipi_eeuu",14,-0.00822,-0.024446,0.010373],["log_reservas","log_ipi_eeuu",15,-0.008579,-0.024974,0.011147],["log_reservas","log_ipi_eeuu",16,-0.008937,-0.025119,0.011735],["log_reservas","log_ipi_eeuu",17,-0.009295,-0.027474,0.011359],["log_reservas","log_ipi_eeuu",18,-0.009639,-0.027857,0.011856],["log_reservas","log_ipi_eeuu",19,-0.009955,-0.0284,0.012074],["log_reservas","log_ipi_eeuu",20,-0.010238,-0.02928,0.012441],["log_reservas","log_ipi_eeuu",21,-0.01049,-0.030179,0.013118],["log_reservas","log_ipi_eeuu",22,-0.01071,-0.030945,0.013617],["log_reservas","log_ipi_eeuu",23,-0.010897,-0.031577,0.013668],["log_reservas","log_ipi_eeuu",24,-0.011049,-0.032075,0.013833],["log_reservas","ffr",0,0.000952,-0.007751,0.00877],["log_reservas","ffr",1,-0.006601,-0.017786,0.004861],["log_reservas","ffr",2,-0.001243,-0.011733,0.011289],["log_reservas","ffr",3,0.004462,-0.006748,0.017215],["log_reservas","ffr",4,0.007525,-0.00245,0.019731],["log_reservas","ffr",5,0.010075,-0.001168,0.022681],["log_reservas","ffr",6,0.012354,0.000695,0.0252],["log_reservas","ffr",7,0.014779,0.00263,0.02621],["log_reservas","ffr",8,0.017723,0.004474,0.029402],["log_reservas","ffr",9,0.020827,0.006432,0.033207],["log_reservas","ffr",10,0.023669,0.008164,0.03599],["log_reservas","ffr",11,0.026183,0.009935,0.039175],["log_reservas","ffr",12,0.028486,0.011872,0.041686],["log_reservas","ffr",13,0.030655,0.012462,0.044318],["log_reservas","ffr",14,0.032676,0.013237,0.046503],["log_reservas","ffr",15,0.0345,0.01366,0.048848],["log_reservas","ffr",16,0.036096,0.014361,0.050004],["log_reservas","ffr",17,0.03746,0.014187,0.052783],["log_reservas","ffr",18,0.038608,0.013809,0.054155],["log_reservas","ffr",19,0.039552,0.013565,0.05475],["log_reservas","ffr",20,0.040298,0.013059,0.055707],["log_reservas","ffr",21,0.04085,0.012364,0.055362],["log_reservas","ffr",22,0.041214,0.011628,0.056051],["log_reservas","ffr",23,0.041401,0.01083,0.057078],["log_reservas","ffr",24,0.041421,0.009975,0.056968],["tpm","log_ipi_eeuu",0,0.029367,-0.017334,0.071491],["tpm","log_ipi_eeuu",1,0.020844,-0.062895,0.096307],["tpm","log_ipi_eeuu",2,0.030187,-0.092115,0.136576],["tpm","log_ipi_eeuu",3,0.042025,-0.118311,0.183229],["tpm","log_ipi_eeuu",4,0.044545,-0.162182,0.224863],["tpm","log_ipi_eeuu",5,0.037728,-0.197935,0.23836],["tpm","log_ipi_eeuu",6,0.027377,-0.219472,0.249179],["tpm","log_ipi_eeuu",7,0.017009,-0.243898,0.249558],["tpm","log_ipi_eeuu",8,0.007461,-0.25533,0.243054],["tpm","log_ipi_eeuu",9,-0.001651,-0.267187,0.239834],["tpm","log_ipi_eeuu",10,-0.010616,-0.278151,0.236664],["tpm","log_ipi_eeuu",11,-0.019159,-0.27916,0.230087],["tpm","log_ipi_eeuu",12,-0.02672,-0.287507,0.210021],["tpm","log_ipi_eeuu",13,-0.032891,-0.277165,0.197581],["tpm","log_ipi_eeuu",14,-0.03758,-0.275769,0.189431],["tpm","log_ipi_eeuu",15,-0.040884,-0.266996,0.178764],["tpm","log_ipi_eeuu",16,-0.042925,-0.251507,0.157785],["tpm","log_ipi_eeuu",17,-0.043788,-0.228932,0.136946],["tpm","log_ipi_eeuu",18,-0.043546,-0.209216,0.128534],["tpm","log_ipi_eeuu",19,-0.0423,-0.197782,0.118089],["tpm","log_ipi_eeuu",20,-0.040184,-0.186313,0.116613],["tpm","log_ipi_eeuu",21,-0.037345,-0.172503,0.102722],["tpm","log_ipi_eeuu",22,-0.033926,-0.162431,0.101764],["tpm","log_ipi_eeuu",23,-0.030057,-0.153167,0.100054],["tpm","log_ipi_eeuu",24,-0.025855,-0.142143,0.101925],["tpm","ffr",0,0.112419,0.069469,0.158812],["tpm","ffr",1,0.199244,0.114899,0.274053],["tpm","ffr",2,0.276196,0.153482,0.365352],["tpm","ffr",3,0.337978,0.173453,0.45054],["tpm","ffr",4,0.382437,0.180281,0.507002],["tpm","ffr",5,0.407323,0.170994,0.550721],["tpm","ffr",6,0.418226,0.156755,0.571822],["tpm","ffr",7,0.420029,0.136936,0.570712],["tpm","ffr",8,0.4144,0.109774,0.571955],["tpm","ffr",9,0.401669,0.081866,0.56305],["tpm","ffr",10,0.382614,0.056596,0.542563],["tpm","ffr",11,0.358681,0.035864,0.515647],["tpm","ffr",12,0.331468,0.015327,0.466347],["tpm","ffr",13,0.30226,-0.006453,0.444458],["tpm","ffr",14,0.271947,-0.039556,0.405001],["tpm","ffr",15,0.241177,-0.061605,0.360141],["tpm","ffr",16,0.210504,-0.087568,0.333466],["tpm","ffr",17,0.180435,-0.108852,0.312963],["tpm","ffr",18,0.151392,-0.122587,0.27435],["tpm","ffr",19,0.123682,-0.138369,0.250367],["tpm","ffr",20,0.097501,-0.157503,0.21962],["tpm","ffr",21,0.072966,-0.168206,0.197628],["tpm","ffr",22,0.050139,-0.183033,0.175094],["tpm","ffr",23,0.029042,-0.195717,0.147908],["tpm","ffr",24,0.009661,-0.199908,0.130445],["cuenta_fin","log_pib_eeuu",0,83.897014,-112.832282,275.83451],["cuenta_fin","log_pib_eeuu",1,0.029826,-250.870193,185.126324],["cuenta_fin","log_pib_eeuu",2,-61.265346,-228.792895,96.957322],["cuenta_fin","log_pib_eeuu",3,-1.922297,-96.831906,118.589683],["cuenta_fin","log_pib_eeuu",4,-37.911306,-110.544969,22.57781],["cuenta_fin","log_pib_eeuu",5,-25.395166,-71.188421,26.00228],["cuenta_fin","log_pib_eeuu",6,-25.262543,-60.23011,24.501502],["cuenta_fin","log_pib_eeuu",7,-23.906173,-62.356215,14.510657],["cuenta_fin","log_pib_eeuu",8,-19.057331,-56.39483,25.34595],["cuenta_fin","log_pib_eeuu",9,-16.234499,-52.574431,25.354269],["cuenta_fin","log_pib_eeuu",10,-12.655339,-49.081035,25.521063],["cuenta_fin","log_pib_eeuu",11,-9.921923,-44.360489,25.307955],["cuenta_fin","log_pib_eeuu",12,-7.985833,-38.931828,18.242252],["cuenta_fin","ffr",0,28.335377,-166.210279,222.155517],["cuenta_fin","ffr",1,-271.804956,-444.783503,-131.838259],["cuenta_fin","ffr",2,-121.734032,-200.596537,31.644014],["cuenta_fin","ffr",3,-108.529337,-178.951815,35.373667],["cuenta_fin","ffr",4,-73.566297,-148.208557,50.653938],["cuenta_fin","ffr",5,-15.426458,-82.58737,112.114448],["cuenta_fin","ffr",6,19.333591,-63.95846,123.454836],["cuenta_fin","ffr",7,55.913226,-29.311935,142.380268],["cuenta_fin","ffr",8,78.849594,-5.033207,155.852842],["cuenta_fin","ffr",9,90.30302,-7.634447,157.353916],["cuenta_fin","ffr",10,90.999392,-5.223296,152.911831],["cuenta_fin","ffr",11,81.502184,-27.367698,147.834738],["cuenta_fin","ffr",12,64.86179,-47.220031,128.00484]],"fevd":[["comercial","base","log_export_cr",1,0.752,2.647],["comercial","base","log_itcer",1,0.554,0.093],["comercial","base","log_export_cr",2,0.504,1.944],["comercial","base","log_itcer",2,1.761,0.65],["comercial","base","log_export_cr",3,0.469,2.954],["comercial","base","log_itcer",3,2.22,0.397],["comercial","base","log_export_cr",4,0.569,2.894],["comercial","base","log_itcer",4,2.047,1.041],["comercial","base","log_export_cr",5,1.17,2.738],["comercial","base","log_itcer",5,1.786,2.862],["comercial","base","log_export_cr",6,1.798,2.976],["comercial","base","log_itcer",6,1.683,5.346],["comercial","base","log_export_cr",7,2.191,3.364],["comercial","base","log_itcer",7,1.733,8.15],["comercial","base","log_export_cr",8,2.557,3.801],["comercial","base","log_itcer",8,1.85,11.082],["comercial","base","log_export_cr",9,2.975,4.327],["comercial","base","log_itcer",9,1.994,14.072],["comercial","base","log_export_cr",10,3.372,4.889],["comercial","base","log_itcer",10,2.161,17.062],["comercial","base","log_export_cr",11,3.723,5.447],["comercial","base","log_itcer",11,2.346,19.975],["comercial","base","log_export_cr",12,4.046,6.011],["comercial","base","log_itcer",12,2.543,22.756],["comercial","base","log_export_cr",13,4.345,6.569],["comercial","base","log_itcer",13,2.745,25.38],["comercial","base","log_export_cr",14,4.617,7.102],["comercial","base","log_itcer",14,2.946,27.838],["comercial","base","log_export_cr",15,4.865,7.602],["comercial","base","log_itcer",15,3.141,30.121],["comercial","base","log_export_cr",16,5.091,8.068],["comercial","base","log_itcer",16,3.331,32.226],["comercial","base","log_export_cr",17,5.295,8.497],["comercial","base","log_itcer",17,3.511,34.153],["comercial","base","log_export_cr",18,5.48,8.886],["comercial","base","log_itcer",18,3.683,35.908],["comercial","base","log_export_cr",19,5.646,9.235],["comercial","base","log_itcer",19,3.845,37.497],["comercial","base","log_export_cr",20,5.795,9.546],["comercial","base","log_itcer",20,3.996,38.926],["comercial","base","log_export_cr",21,5.929,9.819],["comercial","base","log_itcer",21,4.136,40.205],["comercial","base","log_export_cr",22,6.049,10.056],["comercial","base","log_itcer",22,4.266,41.341],["comercial","base","log_export_cr",23,6.155,10.258],["comercial","base","log_itcer",23,4.385,42.343],["comercial","base","log_export_cr",24,6.249,10.429],["comercial","base","log_itcer",24,4.494,43.221],["comercial","fed_primero","log_export_cr",1,1.264,2.134],["comercial","fed_primero","log_itcer",1,0.468,0.179],["comercial","fed_primero","log_export_cr",2,0.849,1.599],["comercial","fed_primero","log_itcer",2,1.384,1.027],["comercial","fed_primero","log_export_cr",3,0.858,2.565],["comercial","fed_primero","log_itcer",3,1.974,0.643],["comercial","fed_primero","log_export_cr",4,0.988,2.475],["comercial","fed_primero","log_itcer",4,2.064,1.025],["comercial","fed_primero","log_export_cr",5,1.659,2.249],["comercial","fed_primero","log_itcer",5,2.052,2.595],["comercial","fed_primero","log_export_cr",6,2.434,2.34],["comercial","fed_primero","log_itcer",6,2.242,4.787],["comercial","fed_primero","log_export_cr",7,2.97,2.585],["comercial","fed_primero","log_itcer",7,2.639,7.244],["comercial","fed_primero","log_export_cr",8,3.481,2.877],["comercial","fed_primero","log_itcer",8,3.119,9.813],["comercial","fed_primero","log_export_cr",9,4.065,3.237],["comercial","fed_primero","log_itcer",9,3.625,12.441],["comercial","fed_primero","log_export_cr",10,4.629,3.632],["comercial","fed_primero","log_itcer",10,4.152,15.07],["comercial","fed_primero","log_export_cr",11,5.137,4.033],["comercial","fed_primero","log_itcer",11,4.693,17.628],["comercial","fed_primero","log_export_cr",12,5.612,4.444],["comercial","fed_primero","log_itcer",12,5.235,20.064],["comercial","fed_primero","log_export_cr",13,6.057,4.857],["comercial","fed_primero","log_itcer",13,5.767,22.359],["comercial","fed_primero","log_export_cr",14,6.466,5.253],["comercial","fed_primero","log_itcer",14,6.279,24.505],["comercial","fed_primero","log_export_cr",15,6.84,5.626],["comercial","fed_primero","log_itcer",15,6.768,26.495],["comercial","fed_primero","log_export_cr",16,7.183,5.976],["comercial","fed_primero","log_itcer",16,7.229,28.327],["comercial","fed_primero","log_export_cr",17,7.494,6.298],["comercial","fed_primero","log_itcer",17,7.663,30.002],["comercial","fed_primero","log_export_cr",18,7.775,6.591],["comercial","fed_primero","log_itcer",18,8.067,31.524],["comercial","fed_primero","log_export_cr",19,8.028,6.853],["comercial","fed_primero","log_itcer",19,8.442,32.899],["comercial","fed_primero","log_export_cr",20,8.255,7.087],["comercial","fed_primero","log_itcer",20,8.787,34.135],["comercial","fed_primero","log_export_cr",21,8.457,7.291],["comercial","fed_primero","log_itcer",21,9.103,35.237],["comercial","fed_primero","log_export_cr",22,8.637,7.467],["comercial","fed_primero","log_itcer",22,9.392,36.215],["comercial","fed_primero","log_export_cr",23,8.796,7.617],["comercial","fed_primero","log_itcer",23,9.653,37.075],["comercial","fed_primero","log_export_cr",24,8.935,7.743],["comercial","fed_primero","log_itcer",24,9.888,37.827],["comercial","generalizada","log_export_cr",1,0.731,2.075],["comercial","generalizada","log_itcer",1,0.55,0.178],["comercial","generalizada","log_export_cr",2,0.503,1.595],["comercial","generalizada","log_itcer",2,1.724,1.005],["comercial","generalizada","log_export_cr",3,0.473,2.589],["comercial","generalizada","log_itcer",3,2.179,0.631],["comercial","generalizada","log_export_cr",4,0.583,2.534],["comercial","generalizada","log_itcer",4,2.024,1.013],["comercial","generalizada","log_export_cr",5,1.216,2.338],["comercial","generalizada","log_itcer",5,1.778,2.585],["comercial","generalizada","log_export_cr",6,1.893,2.464],["comercial","generalizada","log_itcer",6,1.687,4.796],["comercial","generalizada","log_export_cr",7,2.333,2.752],["comercial","generalizada","log_itcer",7,1.744,7.29],["comercial","generalizada","log_export_cr",8,2.751,3.096],["comercial","generalizada","log_itcer",8,1.869,9.91],["comercial","generalizada","log_export_cr",9,3.234,3.518],["comercial","generalizada","log_itcer",9,2.019,12.6],["comercial","generalizada","log_export_cr",10,3.698,3.983],["comercial","generalizada","log_itcer",10,2.193,15.298],["comercial","generalizada","log_export_cr",11,4.117,4.46],["comercial","generalizada","log_itcer",11,2.386,17.927],["comercial","generalizada","log_export_cr",12,4.508,4.951],["comercial","generalizada","log_itcer",12,2.591,20.436],["comercial","generalizada","log_export_cr",13,4.873,5.448],["comercial","generalizada","log_itcer",13,2.8,22.804],["comercial","generalizada","log_export_cr",14,5.211,5.929],["comercial","generalizada","log_itcer",14,3.008,25.021],["comercial","generalizada","log_export_cr",15,5.521,6.386],["comercial","generalizada","log_itcer",15,3.211,27.08],["comercial","generalizada","log_export_cr",16,5.807,6.816],["comercial","generalizada","log_itcer",16,3.407,28.979],["comercial","generalizada","log_export_cr",17,6.067,7.216],["comercial","generalizada","log_itcer",17,3.595,30.718],["comercial","generalizada","log_export_cr",18,6.304,7.582],["comercial","generalizada","log_itcer",18,3.774,32.301],["comercial","generalizada","log_export_cr",19,6.519,7.913],["comercial","generalizada","log_itcer",19,3.942,33.734],["comercial","generalizada","log_export_cr",20,6.713,8.209],["comercial","generalizada","log_itcer",20,4.1,35.025],["comercial","generalizada","log_export_cr",21,6.888,8.47],["comercial","generalizada","log_itcer",21,4.247,36.18],["comercial","generalizada","log_export_cr",22,7.045,8.697],["comercial","generalizada","log_itcer",22,4.383,37.207],["comercial","generalizada","log_export_cr",23,7.185,8.893],["comercial","generalizada","log_itcer",23,4.508,38.115],["comercial","generalizada","log_export_cr",24,7.31,9.058],["comercial","generalizada","log_itcer",24,4.623,38.912],["financiero","base","log_reservas",1,0.218,0.046],["financiero","base","tpm",1,1.493,21.875],["financiero","base","log_reservas",2,0.578,1.163],["financiero","base","tpm",2,0.684,27.589],["financiero","base","log_reservas",3,1.247,0.949],["financiero","base","tpm",3,0.538,31.344],["financiero","base","log_reservas",4,1.548,1.134],["financiero","base","tpm",4,0.563,34.402],["financiero","base","log_reservas",5,1.49,1.788],["financiero","base","tpm",5,0.563,36.739],["financiero","base","log_reservas",6,1.458,2.855],["financiero","base","tpm",6,0.511,38.404],["financiero","base","log_reservas",7,1.564,4.264],["financiero","base","tpm",7,0.442,39.65],["financiero","base","log_reservas",8,1.745,6.023],["financiero","base","tpm",8,0.378,40.69],["financiero","base","log_reservas",9,1.907,8.249],["financiero","base","tpm",9,0.327,41.608],["financiero","base","log_reservas",10,2.031,10.942],["financiero","base","tpm",10,0.29,42.41],["financiero","base","log_reservas",11,2.136,13.943],["financiero","base","tpm",11,0.267,43.089],["financiero","base","log_reservas",12,2.237,17.068],["financiero","base","tpm",12,0.258,43.642],["financiero","base","log_reservas",13,2.34,20.199],["financiero","base","tpm",13,0.262,44.078],["financiero","base","log_reservas",14,2.441,23.266],["financiero","base","tpm",14,0.278,44.406],["financiero","base","log_reservas",15,2.535,26.222],["financiero","base","tpm",15,0.303,44.634],["financiero","base","log_reservas",16,2.624,29.021],["financiero","base","tpm",16,0.335,44.771],["financiero","base","log_reservas",17,2.708,31.632],["financiero","base","tpm",17,0.371,44.825],["financiero","base","log_reservas",18,2.79,34.036],["financiero","base","tpm",18,0.41,44.808],["financiero","base","log_reservas",19,2.872,36.232],["financiero","base","tpm",19,0.448,44.731],["financiero","base","log_reservas",20,2.953,38.227],["financiero","base","tpm",20,0.484,44.606],["financiero","base","log_reservas",21,3.033,40.031],["financiero","base","tpm",21,0.516,44.446],["financiero","base","log_reservas",22,3.113,41.658],["financiero","base","tpm",22,0.544,44.262],["financiero","base","log_reservas",23,3.192,43.122],["financiero","base","tpm",23,0.566,44.065],["financiero","base","log_reservas",24,3.27,44.436],["financiero","base","tpm",24,0.583,43.865],["financiero","fed_primero","log_reservas",1,0.235,0.029],["financiero","fed_primero","tpm",1,0.592,22.775],["financiero","fed_primero","log_reservas",2,0.454,1.286],["financiero","fed_primero","tpm",2,0.182,28.09],["financiero","fed_primero","log_reservas",3,1.113,1.083],["financiero","fed_primero","tpm",3,0.087,31.795],["financiero","fed_primero","log_reservas",4,1.514,1.168],["financiero","fed_primero","tpm",4,0.064,34.901],["financiero","fed_primero","log_reservas",5,1.539,1.739],["financiero","fed_primero","tpm",5,0.048,37.254],["financiero","fed_primero","log_reservas",6,1.597,2.716],["financiero","fed_primero","tpm",6,0.036,38.879],["financiero","fed_primero","log_reservas",7,1.831,3.998],["financiero","fed_primero","tpm",7,0.037,40.055],["financiero","fed_primero","log_reservas",8,2.166,5.602],["financiero","fed_primero","tpm",8,0.054,41.014],["financiero","fed_primero","log_reservas",9,2.495,7.66],["financiero","fed_primero","tpm",9,0.087,41.848],["financiero","fed_primero","log_reservas",10,2.79,10.183],["financiero","fed_primero","tpm",10,0.131,42.569],["financiero","fed_primero","log_reservas",11,3.067,13.011],["financiero","fed_primero","tpm",11,0.188,43.168],["financiero","fed_primero","log_reservas",12,3.341,15.965],["financiero","fed_primero","tpm",12,0.257,43.644],["financiero","fed_primero","log_reservas",13,3.613,18.926],["financiero","fed_primero","tpm",13,0.334,44.007],["financiero","fed_primero","log_reservas",14,3.877,21.83],["financiero","fed_primero","tpm",14,0.416,44.267],["financiero","fed_primero","log_reservas",15,4.126,24.631],["financiero","fed_primero","tpm",15,0.501,44.436],["financiero","fed_primero","log_reservas",16,4.359,27.286],["financiero","fed_primero","tpm",16,0.586,44.52],["financiero","fed_primero","log_reservas",17,4.577,29.762],["financiero","fed_primero","tpm",17,0.666,44.531],["financiero","fed_primero","log_reservas",18,4.785,32.042],["financiero","fed_primero","tpm",18,0.741,44.477],["financiero","fed_primero","log_reservas",19,4.982,34.122],["financiero","fed_primero","tpm",19,0.807,44.371],["financiero","fed_primero","log_reservas",20,5.17,36.009],["financiero","fed_primero","tpm",20,0.865,44.225],["financiero","fed_primero","log_reservas",21,5.35,37.715],["financiero","fed_primero","tpm",21,0.912,44.049],["financiero","fed_primero","log_reservas",22,5.521,39.25],["financiero","fed_primero","tpm",22,0.95,43.856],["financiero","fed_primero","log_reservas",23,5.685,40.629],["financiero","fed_primero","tpm",23,0.977,43.654],["financiero","fed_primero","log_reservas",24,5.842,41.864],["financiero","fed_primero","tpm",24,0.996,43.452],["financiero","generalizada","log_reservas",1,0.217,0.029],["financiero","generalizada","tpm",1,1.201,18.325],["financiero","generalizada","log_reservas",2,0.58,1.293],["financiero","generalizada","tpm",2,0.534,21.948],["financiero","generalizada","log_reservas",3,1.253,1.089],["financiero","generalizada","tpm",3,0.411,24.311],["financiero","generalizada","log_reservas",4,1.55,1.169],["financiero","generalizada","tpm",4,0.423,26.22],["financiero","generalizada","log_reservas",5,1.483,1.731],["financiero","generalizada","tpm",5,0.418,27.658],["financiero","generalizada","log_reservas",6,1.44,2.683],["financiero","generalizada","tpm",6,0.377,28.67],["financiero","generalizada","log_reservas",7,1.531,3.912],["financiero","generalizada","tpm",7,0.324,29.425],["financiero","generalizada","log_reservas",8,1.688,5.419],["financiero","generalizada","tpm",8,0.277,30.058],["financiero","generalizada","log_reservas",9,1.819,7.308],["financiero","generalizada","tpm",9,0.239,30.624],["financiero","generalizada","log_reservas",10,1.906,9.557],["financiero","generalizada","tpm",10,0.212,31.126],["financiero","generalizada","log_reservas",11,1.969,11.998],["financiero","generalizada","tpm",11,0.195,31.56],["financiero","generalizada","log_reservas",12,2.026,14.46],["financiero","generalizada","tpm",12,0.189,31.923],["financiero","generalizada","log_reservas",13,2.083,16.845],["financiero","generalizada","tpm",13,0.192,32.22],["financiero","generalizada","log_reservas",14,2.137,19.11],["financiero","generalizada","tpm",14,0.204,32.455],["financiero","generalizada","log_reservas",15,2.185,21.23],["financiero","generalizada","tpm",15,0.223,32.634],["financiero","generalizada","log_reservas",16,2.229,23.187],["financiero","generalizada","tpm",16,0.247,32.758],["financiero","generalizada","log_reservas",17,2.272,24.969],["financiero","generalizada","tpm",17,0.274,32.833],["financiero","generalizada","log_reservas",18,2.314,26.576],["financiero","generalizada","tpm",18,0.303,32.864],["financiero","generalizada","log_reservas",19,2.358,28.017],["financiero","generalizada","tpm",19,0.332,32.857],["financiero","generalizada","log_reservas",20,2.403,29.307],["financiero","generalizada","tpm",20,0.359,32.818],["financiero","generalizada","log_reservas",21,2.45,30.46],["financiero","generalizada","tpm",21,0.384,32.754],["financiero","generalizada","log_reservas",22,2.497,31.49],["financiero","generalizada","tpm",22,0.405,32.671],["financiero","generalizada","log_reservas",23,2.546,32.41],["financiero","generalizada","tpm",23,0.423,32.577],["financiero","generalizada","log_reservas",24,2.596,33.232],["financiero","generalizada","tpm",24,0.436,32.477],["balanza_pagos","base","cuenta_fin",1,2.18,0.249],["balanza_pagos","base","cuenta_fin",2,1.547,16.416],["balanza_pagos","base","cuenta_fin",3,2.245,18.621],["balanza_pagos","base","cuenta_fin",4,2.19,20.549],["balanza_pagos","base","cuenta_fin",5,2.448,21.349],["balanza_pagos","base","cuenta_fin",6,2.57,21.338],["balanza_pagos","base","cuenta_fin",7,2.692,21.37],["balanza_pagos","base","cuenta_fin",8,2.785,21.831],["balanza_pagos","base","cuenta_fin",9,2.82,22.764],["balanza_pagos","base","cuenta_fin",10,2.825,23.961],["balanza_pagos","base","cuenta_fin",11,2.81,25.142],["balanza_pagos","base","cuenta_fin",12,2.793,26.063],["balanza_pagos","fed_primero","cuenta_fin",1,1.365,1.064],["balanza_pagos","fed_primero","cuenta_fin",2,3.405,14.558],["balanza_pagos","fed_primero","cuenta_fin",3,3.241,17.625],["balanza_pagos","fed_primero","cuenta_fin",4,3.49,19.25],["balanza_pagos","fed_primero","cuenta_fin",5,3.45,20.347],["balanza_pagos","fed_primero","cuenta_fin",6,3.501,20.407],["balanza_pagos","fed_primero","cuenta_fin",7,3.683,20.379],["balanza_pagos","fed_primero","cuenta_fin",8,4.033,20.583],["balanza_pagos","fed_primero","cuenta_fin",9,4.433,21.151],["balanza_pagos","fed_primero","cuenta_fin",10,4.84,21.946],["balanza_pagos","fed_primero","cuenta_fin",11,5.178,22.774],["balanza_pagos","fed_primero","cuenta_fin",12,5.422,23.434],["balanza_pagos","generalizada","cuenta_fin",1,2.111,1.031],["balanza_pagos","generalizada","cuenta_fin",2,1.532,14.412],["balanza_pagos","generalizada","cuenta_fin",3,2.219,17.415],["balanza_pagos","generalizada","cuenta_fin",4,2.173,19.096],["balanza_pagos","generalizada","cuenta_fin",5,2.421,20.122],["balanza_pagos","generalizada","cuenta_fin",6,2.541,20.176],["balanza_pagos","generalizada","cuenta_fin",7,2.663,20.161],["balanza_pagos","generalizada","cuenta_fin",8,2.763,20.418],["balanza_pagos","generalizada","cuenta_fin",9,2.808,21.063],["balanza_pagos","generalizada","cuenta_fin",10,2.826,21.95],["balanza_pagos","generalizada","cuenta_fin",11,2.822,22.868],["balanza_pagos","generalizada","cuenta_fin",12,2.813,23.599]]};
+const VARIABLES = {
+  log_reservas: { nombre: "Reservas internacionales", bloque: "financiero", unidad: "%", escala: 100, mes: true },
+  tpm: { nombre: "Tasa de política del BCCR", bloque: "financiero", unidad: "pp", escala: 1, mes: true },
+  log_itcer: { nombre: "Tipo de cambio efectivo real (ITCER)", bloque: "comercial", unidad: "%", escala: 100, mes: true },
+  log_export_cr: { nombre: "Exportaciones FOB", bloque: "comercial", unidad: "%", escala: 100, mes: true },
+  cuenta_fin: { nombre: "Cuenta financiera (balanza de pagos)", bloque: "balanza_pagos", unidad: "M USD", escala: 1, mes: false },
+};
+const ESP = {
+  base: { nombre: "Cholesky (base)", texto: "Identificación de Cholesky con EE. UU. primero y el ciclo real antes que la Fed: la especificación de la tesis." },
+  fed_primero: { nombre: "Fed primero", texto: "Cholesky con la tasa de la Fed antes que el ciclo real: la prueba de robustez más exigente para el canal financiero." },
+  generalizada: { nombre: "Generalizada", texto: "Descomposición generalizada de Pesaran y Shin (1998): no depende del orden de las variables." },
+};
+const F = D.fevd.map(([bloque, esp, variable, h, r, f]) => ({ bloque, esp, variable, h, r, f }));
+const I = D.irf.map(([variable, impulso, h, e, lo, hi]) => ({ variable, impulso, h, e, lo, hi }));
+const estado = { variable: "log_reservas", esp: "base" };
+
+d3.select("#variable").selectAll("option").data(Object.entries(VARIABLES)).join("option").attr("value", d => d[0]).text(d => d[1].nombre);
+d3.select("#variable").on("change", e => { estado.variable = e.target.value; pintar(); });
+d3.select("#espSeg").selectAll("button").data(Object.entries(ESP)).join("button").text(d => d[1].nombre)
+  .on("click", (e, d) => { estado.esp = d[0]; pintar(); });
+
+function domina(esp) {
+  const s = F.filter(f => f.esp === esp && [6, 12, 24].includes(f.h));
+  return [s.filter(f => f.f > f.r).length, s.length];
+}
+
+function cifras() {
+  const res24 = F.find(f => f.esp === "base" && f.variable === "log_reservas" && f.h === 24);
+  const [b, n] = domina("base"), [g] = domina("generalizada");
+  const items = [
+    [num(res24.f, 1) + " %", "de la varianza de las reservas la explica la Fed a 24 meses"],
+    [num(res24.r, 1) + " %", "la explica el ciclo industrial de EE. UU."],
+    [`${b} de ${n}`, "combinaciones de variable y horizonte donde domina el canal financiero"],
+    [`${g} de ${n}`, "con la descomposición generalizada, que no depende del orden"],
+  ];
+  d3.select("#cifras").selectAll(".cifra").data(items).join(en => { const k = en.append("div").attr("class", "cifra"); k.append("span").attr("class", "v"); k.append("span").attr("class", "l"); return k; })
+    .call(k => { k.select(".v").text(d => d[0]); k.select(".l").text(d => d[1]); });
+}
+
+function fevd() {
+  const v = VARIABLES[estado.variable];
+  const s = F.filter(f => f.esp === estado.esp && f.variable === estado.variable).sort((a, b) => a.h - b.h);
+  const g = d3.select("#fevd"); g.selectAll("*").remove();
+  const W = ancho(), H = 320, m = { l: 44, r: 16, t: 14, b: 32 };
+  g.attr("viewBox", `0 0 ${W} ${H}`);
+  const x = d3.scaleLinear().domain([1, d3.max(s, f => f.h)]).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain([0, Math.max(50, d3.max(s, f => Math.max(f.r, f.f)))]).nice().range([H - m.b, m.t]);
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(5)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(t => t + " %")).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(v.mes ? 8 : 6).tickSize(0)).call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  g.append("text").attr("class", "et-2").attr("x", W - m.r).attr("y", H - 2).attr("text-anchor", "end").text(v.mes ? "meses →" : "trimestres →");
+  for (const [k, c, nombre] of [["f", "--serie-2", "financiero"], ["r", "--serie-1", "real"]]) {
+    g.append("path").datum(s).attr("fill", "none").attr("stroke", css(c)).attr("stroke-width", 2.6).attr("d", d3.line().x(f => x(f.h)).y(f => y(f[k])));
+    const u = s[s.length - 1];
+    g.append("circle").attr("cx", x(u.h)).attr("cy", y(u[k])).attr("r", 5).attr("fill", css(c)).attr("stroke", css("--papel")).attr("stroke-width", 2);
+    g.append("text").attr("class", "et").style("font-weight", 600).attr("x", x(u.h) - 8).attr("y", y(u[k]) - 10).attr("text-anchor", "end").text(num(u[k], 1) + " %");
+  }
+  const cursor = g.append("line").attr("y1", m.t).attr("y2", H - m.b).attr("stroke", css("--tenue")).attr("hidden", true);
+  g.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("pointermove", e => {
+      const h = Math.max(1, Math.min(s.length, Math.round(x.invert(d3.pointer(e)[0])))), f = s.find(f => f.h === h);
+      cursor.attr("hidden", null).attr("x1", x(h)).attr("x2", x(h));
+      mostrarTip(e, `${h} ${v.mes ? "meses" : "trimestres"}`, [["Canal financiero", num(f.f, 1) + " %"], ["Canal real", num(f.r, 1) + " %"]]);
+    })
+    .on("pointerleave", () => { cursor.attr("hidden", true); ocultarTip(); });
+  const u = s[s.length - 1];
+  d3.select("#tFevd").text(`${v.nombre}: la Fed explica ${num(u.f, 1)} % y el ciclo real ${num(u.r, 1)} % a ${u.h} ${v.mes ? "meses" : "trimestres"}`);
+  d3.select("#pEsp").text(ESP[estado.esp].texto + " Porcentaje de la varianza del error de predicción.");
+}
+
+function irf(id, impulso, parrafo) {
+  const v = VARIABLES[estado.variable];
+  const s = I.filter(r => r.variable === estado.variable && (impulso === "ffr" ? r.impulso === "ffr" : r.impulso !== "ffr")).sort((a, b) => a.h - b.h)
+    .map(r => ({ h: r.h, e: r.e * v.escala, lo: r.lo * v.escala, hi: r.hi * v.escala }));
+  const g = d3.select(id); g.selectAll("*").remove();
+  const W = 520, H = 280, m = { l: 50, r: 12, t: 12, b: 30 };
+  const x = d3.scaleLinear().domain([0, d3.max(s, r => r.h)]).range([m.l, W - m.r]);
+  const ext = d3.extent(s.flatMap(r => [r.lo, r.hi, 0]));
+  const y = d3.scaleLinear().domain(ext).nice().range([H - m.b, m.t]);
+  const dec = Math.abs(ext[1] - ext[0]) < 1 ? 2 : Math.abs(ext[1] - ext[0]) < 10 ? 1 : 0;
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(4)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickFormat(t => firmado(t, dec))).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(6).tickSize(0)).call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  const color = impulso === "ffr" ? "--serie-2" : "--serie-1";
+  g.append("path").datum(s).attr("fill", css(color)).attr("fill-opacity", 0.16).attr("d", d3.area().x(r => x(r.h)).y0(r => y(r.lo)).y1(r => y(r.hi)));
+  g.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", css("--tenue"));
+  g.append("path").datum(s).attr("fill", "none").attr("stroke", css(color)).attr("stroke-width", 2.4).attr("d", d3.line().x(r => x(r.h)).y(r => y(r.e)));
+  g.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("pointermove", e => {
+      const h = Math.max(0, Math.min(s.length - 1, Math.round(x.invert(d3.pointer(e)[0])))), r = s[h];
+      mostrarTip(e, `${h} ${v.mes ? "meses" : "trimestres"}`, [["Efecto", firmado(r.e, 2) + " " + v.unidad], ["Banda 95 %", `${firmado(r.lo, 2)} a ${firmado(r.hi, 2)}`], ["Distinto de cero", r.lo > 0 || r.hi < 0 ? "sí" : "no"]]);
+    })
+    .on("pointerleave", ocultarTip);
+  const sig = s.filter(r => r.lo > 0 || r.hi < 0).length;
+  d3.select(parrafo).text(`${v.nombre}, en ${v.unidad === "%" ? "% de desviación" : v.unidad}. Distinto de cero en ${sig} de ${s.length} ${v.mes ? "meses" : "trimestres"}.`);
+}
+
+function robustez() {
+  const filas = [
+    ["Cholesky base (EE. UU. primero, ciclo real antes que la Fed)", ...domina("base")],
+    ["Variables de Costa Rica invertidas", null, null],
+    ["Fed antes que el ciclo real", ...domina("fed_primero")],
+    ["Generalizada de Pesaran y Shin (no depende del orden)", ...domina("generalizada")],
+  ];
+  d3.select("#robustez tbody").selectAll("tr").data(filas).join("tr").attr("class", (d, i) => i === 3 ? "fuerte" : null)
+    .html(d => `<td>${d[0]}</td><td>${d[1] == null ? "igual que la base: ningún porcentaje cambia" : `${d[1]} de ${d[2]}`}</td>`);
+}
+
+function pintar() {
+  d3.select("#variable").property("value", estado.variable);
+  d3.select("#espSeg").selectAll("button").attr("aria-pressed", d => String(d[0] === estado.esp));
+  fevd(); irf("#irfFin", "ffr", "#pIrf1"); irf("#irfReal", "real", "#pIrf2");
+}
+cifras(); robustez(); pintar();
+alCambiarTema(() => { cifras(); robustez(); pintar(); });
+alRedimensionar(pintar);
+</script>
+</body>
+</html>

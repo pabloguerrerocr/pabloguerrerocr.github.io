@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EE. UU. y el sector externo de Costa Rica · Pablo Guerrero</title>
+<meta name="description" content="Tablero interactivo del TFG: cuánto del sector externo de Costa Rica explican el ciclo real y la tasa de la Fed, con tres identificaciones y bandas bootstrap.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>/*COMUN_CSS*/
+.tabla{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;}
+.tabla th,.tabla td{padding:9px 10px;border-bottom:1px solid var(--linea);text-align:left;}
+.tabla td:last-child,.tabla th:last-child{text-align:right;}
+.tabla th{font-size:12px;color:var(--tenue);font-weight:600;}
+.tabla tr.fuerte td{font-weight:600;color:var(--tinta);}
+</style>
+</head>
+<body>
+<div class="caja">
+  <a class="volver" href="../">← Pablo Guerrero</a>
+  <header class="top">
+    <p class="kicker">Trabajo Final de Graduación · VAR/VECM · 2015–2025</p>
+    <h1>Sobre el sector externo de Costa Rica, la tasa de la Fed pesa más que el ciclo de Estados Unidos</h1>
+    <p class="lede">Estados Unidos afecta a una economía pequeña y abierta por dos canales: su ciclo económico mueve la demanda de exportaciones (canal real) y la tasa de la Reserva Federal mueve los flujos de capital (canal financiero). Elegí una variable de Costa Rica y una forma de identificar los choques, y mirá cuánto explica cada canal.</p>
+    <div class="meta"><span>Datos: FRED y BCCR</span><span><a href="https://github.com/pabloguerrerocr/sector-externo-cr-eeuu">Código y metodología →</a></span><span><a href="resumen.pdf">Resumen en PDF (2 páginas) →</a></span></div>
+  </header>
+
+  <section class="cifras" id="cifras"></section>
+
+  <section class="panel">
+    <div class="controles">
+      <label class="ctl" for="variable">Variable <select id="variable"></select></label>
+      <div class="seg" id="espSeg" role="group" aria-label="Identificación de los choques"></div>
+    </div>
+    <div class="cab"><h2 id="tFevd"></h2><p id="pEsp"></p></div>
+    <svg class="graf" id="fevd" viewBox="0 0 1000 320" role="img" aria-label="Porcentaje de la varianza explicado por cada canal según el horizonte"></svg>
+    <div class="leyenda"><span><i style="background:var(--serie-2)"></i>Canal financiero (tasa de la Fed)</span><span><i style="background:var(--serie-1)"></i>Canal real (ciclo de EE. UU.)</span></div>
+  </section>
+
+  <section class="dos">
+    <div class="panel">
+      <div class="cab"><h2>Respuesta a un alza de la Fed</h2><p id="pIrf1"></p></div>
+      <svg class="graf" id="irfFin" viewBox="0 0 520 280"></svg>
+    </div>
+    <div class="panel">
+      <div class="cab"><h2>Respuesta a un auge del ciclo de EE. UU.</h2><p id="pIrf2"></p></div>
+      <svg class="graf" id="irfReal" viewBox="0 0 520 280"></svg>
+    </div>
+  </section>
+  <p class="nota" style="margin-top:-14px">Choque de una desviación estándar, identificado con Cholesky. La banda es el intervalo Monte Carlo al 95 % (500 réplicas). Donde la banda cruza el cero, el efecto no se distingue de cero, y eso también es un resultado.</p>
+
+  <section class="panel">
+    <div class="cab"><h2>¿Depende del orden de las variables?</h2><p>La descomposición de Cholesky depende del orden. La conclusión se probó con todos los órdenes que respetan «EE. UU. antes que Costa Rica» y con la descomposición generalizada, que no depende del orden.</p></div>
+    <table class="tabla" id="robustez">
+      <thead><tr><th>Identificación</th><th>Domina el canal financiero</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="nota">Invertir las variables de Costa Rica no mueve ningún porcentaje: con Cholesky, la parte que explican los choques de EE. UU. no depende del orden de las variables que van después. La prueba que importa es poner la Fed antes que el ciclo real. Ahí solo cambian las exportaciones, que ya eran casi un empate.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Límites declarados</h2>
+    <div style="display:grid;gap:10px;margin-top:10px">
+      <p class="limite">Hay <b>autocorrelación remanente</b> en los tres bloques (Portmanteau, p = 0,0004; 0,0063 y 0,0252). Las bandas se leen con cautela.</p>
+      <p class="limite"><b>Las reservas suben tras un alza de la Fed</b>, al revés de la historia clásica de fuga de capitales. Casi seguro refleja la acumulación de reservas de 2022–2024: es una correlación de ese período, no una ley general.</p>
+      <p class="limite">El bloque de balanza de pagos tiene <b>44 observaciones</b> trimestrales. Sus resultados son indicativos y se reportan solo hasta 12 trimestres.</p>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <span>Pablo Guerrero · Costa Rica</span>
+    <span>Fuente: FRED (producción industrial, PIB, tasa de fondos federales) y BCCR (exportaciones, ITCER, reservas, tasa de política, balanza de pagos). Trabajo Final de Graduación, Licenciatura en Economía, Universidad Latina de Costa Rica.</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+/*COMUN_JS*/
+const D = /*DATOS*/null;
+const VARIABLES = {
+  log_reservas: { nombre: "Reservas internacionales", bloque: "financiero", unidad: "%", escala: 100, mes: true },
+  tpm: { nombre: "Tasa de política del BCCR", bloque: "financiero", unidad: "pp", escala: 1, mes: true },
+  log_itcer: { nombre: "Tipo de cambio efectivo real (ITCER)", bloque: "comercial", unidad: "%", escala: 100, mes: true },
+  log_export_cr: { nombre: "Exportaciones FOB", bloque: "comercial", unidad: "%", escala: 100, mes: true },
+  cuenta_fin: { nombre: "Cuenta financiera (balanza de pagos)", bloque: "balanza_pagos", unidad: "M USD", escala: 1, mes: false },
+};
+const ESP = {
+  base: { nombre: "Cholesky (base)", texto: "Identificación de Cholesky con EE. UU. primero y el ciclo real antes que la Fed: la especificación de la tesis." },
+  fed_primero: { nombre: "Fed primero", texto: "Cholesky con la tasa de la Fed antes que el ciclo real: la prueba de robustez más exigente para el canal financiero." },
+  generalizada: { nombre: "Generalizada", texto: "Descomposición generalizada de Pesaran y Shin (1998): no depende del orden de las variables." },
+};
+const F = D.fevd.map(([bloque, esp, variable, h, r, f]) => ({ bloque, esp, variable, h, r, f }));
+const I = D.irf.map(([variable, impulso, h, e, lo, hi]) => ({ variable, impulso, h, e, lo, hi }));
+const estado = { variable: "log_reservas", esp: "base" };
+
+d3.select("#variable").selectAll("option").data(Object.entries(VARIABLES)).join("option").attr("value", d => d[0]).text(d => d[1].nombre);
+d3.select("#variable").on("change", e => { estado.variable = e.target.value; pintar(); });
+d3.select("#espSeg").selectAll("button").data(Object.entries(ESP)).join("button").text(d => d[1].nombre)
+  .on("click", (e, d) => { estado.esp = d[0]; pintar(); });
+
+function domina(esp) {
+  const s = F.filter(f => f.esp === esp && [6, 12, 24].includes(f.h));
+  return [s.filter(f => f.f > f.r).length, s.length];
+}
+
+function cifras() {
+  const res24 = F.find(f => f.esp === "base" && f.variable === "log_reservas" && f.h === 24);
+  const [b, n] = domina("base"), [g] = domina("generalizada");
+  const items = [
+    [num(res24.f, 1) + " %", "de la varianza de las reservas la explica la Fed a 24 meses"],
+    [num(res24.r, 1) + " %", "la explica el ciclo industrial de EE. UU."],
+    [`${b} de ${n}`, "combinaciones de variable y horizonte donde domina el canal financiero"],
+    [`${g} de ${n}`, "con la descomposición generalizada, que no depende del orden"],
+  ];
+  d3.select("#cifras").selectAll(".cifra").data(items).join(en => { const k = en.append("div").attr("class", "cifra"); k.append("span").attr("class", "v"); k.append("span").attr("class", "l"); return k; })
+    .call(k => { k.select(".v").text(d => d[0]); k.select(".l").text(d => d[1]); });
+}
+
+function fevd() {
+  const v = VARIABLES[estado.variable];
+  const s = F.filter(f => f.esp === estado.esp && f.variable === estado.variable).sort((a, b) => a.h - b.h);
+  const g = d3.select("#fevd"); g.selectAll("*").remove();
+  const W = ancho(), H = 320, m = { l: 44, r: 16, t: 14, b: 32 };
+  g.attr("viewBox", `0 0 ${W} ${H}`);
+  const x = d3.scaleLinear().domain([1, d3.max(s, f => f.h)]).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain([0, Math.max(50, d3.max(s, f => Math.max(f.r, f.f)))]).nice().range([H - m.b, m.t]);
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(5)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(t => t + " %")).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(v.mes ? 8 : 6).tickSize(0)).call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  g.append("text").attr("class", "et-2").attr("x", W - m.r).attr("y", H - 2).attr("text-anchor", "end").text(v.mes ? "meses →" : "trimestres →");
+  for (const [k, c, nombre] of [["f", "--serie-2", "financiero"], ["r", "--serie-1", "real"]]) {
+    g.append("path").datum(s).attr("fill", "none").attr("stroke", css(c)).attr("stroke-width", 2.6).attr("d", d3.line().x(f => x(f.h)).y(f => y(f[k])));
+    const u = s[s.length - 1];
+    g.append("circle").attr("cx", x(u.h)).attr("cy", y(u[k])).attr("r", 5).attr("fill", css(c)).attr("stroke", css("--papel")).attr("stroke-width", 2);
+    g.append("text").attr("class", "et").style("font-weight", 600).attr("x", x(u.h) - 8).attr("y", y(u[k]) - 10).attr("text-anchor", "end").text(num(u[k], 1) + " %");
+  }
+  const cursor = g.append("line").attr("y1", m.t).attr("y2", H - m.b).attr("stroke", css("--tenue")).attr("hidden", true);
+  g.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("pointermove", e => {
+      const h = Math.max(1, Math.min(s.length, Math.round(x.invert(d3.pointer(e)[0])))), f = s.find(f => f.h === h);
+      cursor.attr("hidden", null).attr("x1", x(h)).attr("x2", x(h));
+      mostrarTip(e, `${h} ${v.mes ? "meses" : "trimestres"}`, [["Canal financiero", num(f.f, 1) + " %"], ["Canal real", num(f.r, 1) + " %"]]);
+    })
+    .on("pointerleave", () => { cursor.attr("hidden", true); ocultarTip(); });
+  const u = s[s.length - 1];
+  d3.select("#tFevd").text(`${v.nombre}: la Fed explica ${num(u.f, 1)} % y el ciclo real ${num(u.r, 1)} % a ${u.h} ${v.mes ? "meses" : "trimestres"}`);
+  d3.select("#pEsp").text(ESP[estado.esp].texto + " Porcentaje de la varianza del error de predicción.");
+}
+
+function irf(id, impulso, parrafo) {
+  const v = VARIABLES[estado.variable];
+  const s = I.filter(r => r.variable === estado.variable && (impulso === "ffr" ? r.impulso === "ffr" : r.impulso !== "ffr")).sort((a, b) => a.h - b.h)
+    .map(r => ({ h: r.h, e: r.e * v.escala, lo: r.lo * v.escala, hi: r.hi * v.escala }));
+  const g = d3.select(id); g.selectAll("*").remove();
+  const W = 520, H = 280, m = { l: 50, r: 12, t: 12, b: 30 };
+  const x = d3.scaleLinear().domain([0, d3.max(s, r => r.h)]).range([m.l, W - m.r]);
+  const ext = d3.extent(s.flatMap(r => [r.lo, r.hi, 0]));
+  const y = d3.scaleLinear().domain(ext).nice().range([H - m.b, m.t]);
+  const dec = Math.abs(ext[1] - ext[0]) < 1 ? 2 : Math.abs(ext[1] - ext[0]) < 10 ? 1 : 0;
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(4)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickFormat(t => firmado(t, dec))).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(6).tickSize(0)).call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  const color = impulso === "ffr" ? "--serie-2" : "--serie-1";
+  g.append("path").datum(s).attr("fill", css(color)).attr("fill-opacity", 0.16).attr("d", d3.area().x(r => x(r.h)).y0(r => y(r.lo)).y1(r => y(r.hi)));
+  g.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", css("--tenue"));
+  g.append("path").datum(s).attr("fill", "none").attr("stroke", css(color)).attr("stroke-width", 2.4).attr("d", d3.line().x(r => x(r.h)).y(r => y(r.e)));
+  g.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("pointermove", e => {
+      const h = Math.max(0, Math.min(s.length - 1, Math.round(x.invert(d3.pointer(e)[0])))), r = s[h];
+      mostrarTip(e, `${h} ${v.mes ? "meses" : "trimestres"}`, [["Efecto", firmado(r.e, 2) + " " + v.unidad], ["Banda 95 %", `${firmado(r.lo, 2)} a ${firmado(r.hi, 2)}`], ["Distinto de cero", r.lo > 0 || r.hi < 0 ? "sí" : "no"]]);
+    })
+    .on("pointerleave", ocultarTip);
+  const sig = s.filter(r => r.lo > 0 || r.hi < 0).length;
+  d3.select(parrafo).text(`${v.nombre}, en ${v.unidad === "%" ? "% de desviación" : v.unidad}. Distinto de cero en ${sig} de ${s.length} ${v.mes ? "meses" : "trimestres"}.`);
+}
+
+function robustez() {
+  const filas = [
+    ["Cholesky base (EE. UU. primero, ciclo real antes que la Fed)", ...domina("base")],
+    ["Variables de Costa Rica invertidas", null, null],
+    ["Fed antes que el ciclo real", ...domina("fed_primero")],
+    ["Generalizada de Pesaran y Shin (no depende del orden)", ...domina("generalizada")],
+  ];
+  d3.select("#robustez tbody").selectAll("tr").data(filas).join("tr").attr("class", (d, i) => i === 3 ? "fuerte" : null)
+    .html(d => `<td>${d[0]}</td><td>${d[1] == null ? "igual que la base: ningún porcentaje cambia" : `${d[1]} de ${d[2]}`}</td>`);
+}
+
+function pintar() {
+  d3.select("#variable").property("value", estado.variable);
+  d3.select("#espSeg").selectAll("button").attr("aria-pressed", d => String(d[0] === estado.esp));
+  fevd(); irf("#irfFin", "ffr", "#pIrf1"); irf("#irfReal", "real", "#pIrf2");
+}
+cifras(); robustez(); pintar();
+alCambiarTema(() => { cifras(); robustez(); pintar(); });
+alRedimensionar(pintar);
+</script>
+</body>
+</html>

@@ -241,6 +241,14 @@
     <h2>Tableros interactivos</h2>
     <p class="lead">Los datos de cada hallazgo, para explorarlos en vez de leerlos.</p>
     <div class="tableros">
+      <a class="tablero" href="tfg/">
+        <img src="tableros/img/tfg.png" alt="Descomposición de varianza: canal financiero contra canal real según el horizonte" loading="lazy" width="720" height="450">
+        <div class="txt">
+          <h3>Estados Unidos y el sector externo de Costa Rica</h3>
+          <p>Mi trabajo final de graduación: cuánto explican la tasa de la Fed y el ciclo de EE. UU., con tres identificaciones y bandas bootstrap.</p>
+          <span class="ir">Explorar la investigación →</span>
+        </div>
+      </a>
       <a class="tablero" href="atlas/">
         <img src="tableros/img/atlas.png" alt="Mapa mundial coloreado por cambio anual de la población, con la ficha de un país" loading="lazy" width="720" height="450">
         <div class="txt">
@@ -285,8 +293,8 @@
       <div>
         <h3>El canal financiero de Estados Unidos domina al real</h3>
         <p>A 24 meses, la tasa de política de la Reserva Federal explica el <b>44,4 %</b> de la varianza de las reservas internacionales de Costa Rica. El ciclo industrial estadounidense explica <b>3,3 %</b>. La dominancia del canal financiero se sostiene en las <b>14 combinaciones</b> de variable y horizonte evaluadas.</p>
-        <p class="limite"><b>Límite declarado:</b> la descomposición depende del orden de Cholesky, que es una decisión económica y no estadística. Está documentada en el repositorio.</p>
-        <p class="fuente">VAR/VECM · 2015–2025 · BCCR y FRED</p>
+        <p class="limite"><b>Límite declarado:</b> la descomposición depende del orden de Cholesky. Con la descomposición generalizada, que no depende del orden, el canal financiero domina igual en las 14 combinaciones; con la Fed ordenada primero, en 11 de 14. Solo las exportaciones, casi empatadas, cambian.</p>
+        <p class="fuente">VAR/VECM · 2015–2025 · BCCR y FRED · <a href="tfg/">Explorar los datos →</a> · <a href="tfg/resumen.pdf">Resumen en PDF</a></p>
       </div>
     </div>
 
@@ -334,10 +342,10 @@
     <p class="lead">Código abierto, datos públicos, una corrida limpia repite el reporte.</p>
     <div class="repos">
       <div class="repo">
-        <h3>sector-externo-cr-eeuu <span class="estado">en revisión académica</span></h3>
+        <h3><a href="https://github.com/pabloguerrerocr/sector-externo-cr-eeuu">sector-externo-cr-eeuu</a> <span class="estado">trabajo final de graduación</span></h3>
         <p>Transmisión del ciclo y la política monetaria de Estados Unidos al sector externo de Costa Rica. Tres bloques VAR/VECM, 26 figuras, 31 tablas, sobre datos reales 2015–2025. Es el análisis que sostiene el primer hallazgo de esta página.</p>
         <p class="tags">VAR · VECM · cointegración · impulso-respuesta</p>
-        <p class="nota-repo">El repositorio permanece privado hasta que concluya la revisión del Trabajo Final de Graduación. Disponible a solicitud.</p>
+        <p class="nota-repo">Incluye la prueba de robustez al orden de Cholesky y la descomposición generalizada de Pesaran y Shin.</p>
       </div>
       <div class="repo">
         <h3><a href="https://github.com/pabloguerrerocr/warehouse-sector-externo">warehouse-sector-externo</a></h3>
