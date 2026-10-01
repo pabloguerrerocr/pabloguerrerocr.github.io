@@ -206,6 +206,8 @@
   .tableros{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
   a.tablero{display:grid;align-content:start;background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;color:var(--texto);transition:border-color .15s, transform .15s;}
   a.tablero:hover{border-color:var(--azul);transform:translateY(-2px);}
+  .tableros a.tablero:first-child{grid-column:1/-1;}
+  .tableros a.tablero:first-child img{aspect-ratio:16/7;}
   .tablero img{display:block;width:100%;height:auto;aspect-ratio:8/5;object-fit:cover;object-position:top;border-bottom:1px solid var(--linea);background:var(--papel-2);}
   .tablero .txt{padding:14px 16px 16px;display:grid;gap:4px;}
   .tablero h3{margin:0;font-size:15.5px;font-weight:600;color:var(--tinta);}
