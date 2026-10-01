@@ -313,9 +313,19 @@
       <div class="cifra">+6,5 %<small>sobre el promedio histórico</small></div>
       <div>
         <h3>El referente ingenuo es difícil de vencer, y casi nadie lo reporta</h3>
-        <p>Nowcast del PIB trimestral: <b>30,6 %</b> de mejora sobre el referente ingenuo y <b>6,5 %</b> sobre el promedio histórico, que es el exigente. La señal está en producción manufacturera (t = 3,53).</p>
+        <p>Nowcast del PIB trimestral: <b>30,6 %</b> de mejora sobre el referente ingenuo y <b>6,5 %</b> sobre el promedio histórico, que es el exigente. La señal está en producción manufacturera (t = 3,53). Ridge, LASSO, Random Forest y Gradient Boosting no le ganan a esta regresión de dos variables con significancia (Diebold-Mariano, p ≥ 0,32), y una réplica en R reproduce el resultado trimestre por trimestre.</p>
         <p class="limite"><b>Límite declarado:</b> R² de 0,154 y el modelo no anticipa quiebres. Lo declaro porque un resultado que no sobrevive al escrutinio es un hallazgo, no un fracaso que esconder.</p>
         <p class="fuente">Nowcasting · datos OCDE · <a href="nowcast/">Explorar los datos →</a></p>
+      </div>
+    </div>
+
+    <div class="hallazgo">
+      <div class="cifra">62,0 %<small>del fraude ahorrado</small></div>
+      <div>
+        <h3>En fraude, la exactitud engaña: hay que medir en dinero</h3>
+        <p>Sobre 284.807 transacciones reales con tarjeta, no alertar nunca acierta el <b>99,87 %</b> y no ahorra nada. Si revisar una alerta cuesta €15, alertar cuando probabilidad × monto supera ese costo ahorra el <b>62,0 %</b> del fraude, contra <b>54,5 %</b> del mejor umbral único (IC 95 %: +€379 a +€782), aunque detecta menos fraudes.</p>
+        <p class="limite"><b>Límite declarado:</b> la prueba tiene 75 fraudes, así que con costos de revisión de €1 y €5 la diferencia no es significativa y no se declara ganador.</p>
+        <p class="fuente">Machine learning · scikit-learn · partición temporal · <a href="https://github.com/pabloguerrerocr/portfolio-data-analytics/tree/main/deteccion-fraude">Ver el repositorio →</a></p>
       </div>
     </div>
 
@@ -361,8 +371,8 @@
       </div>
       <div class="repo">
         <h3><a href="https://github.com/pabloguerrerocr/portfolio-data-analytics">portfolio-data-analytics</a></h3>
-        <p>Nowcast del PIB trimestral evaluado contra dos referentes, y el atlas de población y economía, cuyos indicadores del Banco Mundial y el FMI se actualizan solos cada mes con GitHub Actions.</p>
-        <p class="tags">Nowcasting · GitHub Actions · D3</p>
+        <p>Nowcast del PIB trimestral evaluado contra dos referentes y contra machine learning, con réplica en R; detección de fraude medida en dinero; y el atlas de población y economía, cuyos indicadores del Banco Mundial y el FMI se actualizan solos cada mes con GitHub Actions.</p>
+        <p class="tags">Nowcasting · scikit-learn · R · GitHub Actions · D3</p>
       </div>
       <div class="repo">
         <h3><a href="https://github.com/pabloguerrerocr/contaflow">contaflow</a></h3>
@@ -420,7 +430,7 @@
       </tr>
       <tr>
         <th>Herramientas</th>
-        <td>Python (pandas, NumPy, statsmodels) · SQL, DuckDB y dbt · Power BI · Excel y Power Query · Git</td>
+        <td>Python (pandas, NumPy, statsmodels, scikit-learn) · R (dplyr, ggplot2) · SQL, DuckDB y dbt · Power BI · Excel y Power Query · Git</td>
       </tr>
       <tr>
         <th>Idiomas</th>
