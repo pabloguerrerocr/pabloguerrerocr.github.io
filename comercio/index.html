@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comercio exterior de Costa Rica · Pablo Guerrero</title>
+<meta name="description" content="Tablero interactivo: cómo se concentraron los destinos y productos de exportación de Costa Rica entre 2010 y 2024.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>/* Estilo común de los tableros. Mismos tokens que index.html del sitio. */
+:root{
+  --tinta:#12243a; --tinta-2:#2c415c; --azul:#1b4f8a; --ocre:#a8621a;
+  --fondo:#f4f5f6; --papel:#ffffff; --papel-2:#eceef0; --linea:#d7dade;
+  --texto:#1a1f26; --tenue:#5d666f; --radio:4px;
+  --serie-1:#1b4f8a; --serie-2:#c2611d; --serie-3:#6b7785; --serie-4:#2f8f6b;
+  --bien:#0ca30c; --mal:#d03b3b;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --tinta:#dfe6ee; --tinta-2:#a9bed6; --azul:#7fb3e8; --ocre:#e0995a;
+    --fondo:#0e1319; --papel:#161c24; --papel-2:#1e262f; --linea:#2c353f;
+    --texto:#e4e8ec; --tenue:#95a0ac;
+    --serie-1:#7fb3e8; --serie-2:#e0995a; --serie-3:#95a0ac; --serie-4:#5fc79e;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --tinta:#dfe6ee; --tinta-2:#a9bed6; --azul:#7fb3e8; --ocre:#e0995a;
+  --fondo:#0e1319; --papel:#161c24; --papel-2:#1e262f; --linea:#2c353f;
+  --texto:#e4e8ec; --tenue:#95a0ac;
+  --serie-1:#7fb3e8; --serie-2:#e0995a; --serie-3:#95a0ac; --serie-4:#5fc79e;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;padding:0 20px;background:var(--fondo);color:var(--texto);
+  font-family:"Public Sans",ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+.caja{max-width:1100px;margin:0 auto;padding-block:28px 56px;display:grid;gap:26px;}
+a{color:var(--azul);text-decoration:none;border-bottom:1px solid transparent;}
+a:hover{border-bottom-color:var(--azul);}
+:focus-visible{outline:2px solid var(--ocre);outline-offset:2px;}
+.volver{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.06em;}
+header.top{display:grid;gap:10px;padding-bottom:22px;border-bottom:3px double var(--tinta);}
+.kicker{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ocre);margin:0;}
+h1{font-family:"Newsreader",Georgia,serif;font-weight:500;font-size:clamp(30px,5vw,46px);line-height:1.06;letter-spacing:-.02em;margin:0;color:var(--tinta);text-wrap:balance;max-width:24ch;}
+h2{font-family:"Newsreader",Georgia,serif;font-weight:600;font-size:22px;margin:0;color:var(--tinta);text-wrap:balance;}
+h3{font-size:15px;font-weight:600;margin:0;color:var(--tinta);}
+p{margin:0;}
+.lede{font-size:17px;max-width:66ch;}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;color:var(--tenue);}
+.panel{background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:18px;min-width:0;}
+.cab{display:grid;gap:4px;margin-bottom:12px;}
+.cab p{color:var(--tenue);font-size:14px;max-width:70ch;}
+.cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--linea);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;}
+.cifra{background:var(--papel);padding:14px 16px;display:grid;gap:2px;min-width:0;}
+.cifra .v{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:24px;font-weight:500;color:var(--ocre);font-variant-numeric:tabular-nums;line-height:1.2;}
+.cifra .l{font-size:12.5px;color:var(--tenue);}
+@media (max-width:760px){.cifras{grid-template-columns:repeat(2,minmax(0,1fr));}.cifra .v{font-size:20px;}}
+.dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;}
+@media (max-width:900px){.dos{grid-template-columns:minmax(0,1fr);}}
+.controles{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px;}
+.seg{display:inline-flex;border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden;}
+.seg button{border:0;border-right:1px solid var(--linea);background:var(--papel);color:var(--texto);padding:5px 11px;font:inherit;font-size:13px;cursor:pointer;}
+.seg button:last-child{border-right:0;}
+.seg button[aria-pressed="true"]{background:var(--tinta);color:var(--papel);}
+label.ctl{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--tenue);}
+select,input[type=search]{font:inherit;font-size:13.5px;color:var(--texto);background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:5px 9px;max-width:100%;}
+input[type=range]{accent-color:var(--ocre);flex:1 1 180px;min-width:0;}
+.anio{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:26px;font-weight:500;color:var(--tinta);font-variant-numeric:tabular-nums;min-width:64px;}
+.play{border:1px solid var(--linea);background:var(--papel);color:var(--texto);border-radius:var(--radio);width:34px;height:30px;cursor:pointer;font-size:13px;}
+svg.graf{width:100%;height:auto;display:block;overflow:visible;}
+.eje text{fill:var(--tenue);font-family:"JetBrains Mono",ui-monospace,monospace;font-size:11px;}
+.eje line,.eje path{stroke:var(--linea);}
+.rejilla line{stroke:var(--linea);stroke-dasharray:2 3;}
+.et{fill:var(--texto);font-size:12px;}
+.et-2{fill:var(--tenue);font-size:11.5px;font-variant-numeric:tabular-nums;}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--tenue);margin-top:8px;}
+.leyenda i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px;}
+.nota{font-size:12.5px;color:var(--tenue);margin-top:8px;max-width:75ch;}
+.limite{font-size:13.5px;color:var(--tenue);border-left:2px solid var(--linea);padding-left:12px;}
+.limite b{color:var(--ocre);font-weight:600;}
+.tip{position:fixed;pointer-events:none;background:var(--papel);border:1px solid var(--linea);border-radius:var(--radio);padding:8px 10px;font-size:12.5px;box-shadow:0 6px 18px rgb(0 0 0/.14);min-width:160px;z-index:10;}
+.tip b{display:block;font-family:"Newsreader",Georgia,serif;font-size:15px;margin-bottom:2px;}
+.tip .f{display:flex;justify-content:space-between;gap:14px;color:var(--tenue);}
+.tip .f span:last-child{color:var(--texto);font-variant-numeric:tabular-nums;}
+footer.pie{display:grid;gap:4px;font-size:12.5px;color:var(--tenue);border-top:1px solid var(--linea);padding-top:14px;}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important;}}
+</style>
+</head>
+<body>
+<div class="caja">
+  <a class="volver" href="../">← Pablo Guerrero</a>
+  <header class="top">
+    <p class="kicker">Comercio exterior · Costa Rica · 2010–2024</p>
+    <h1>El comercio exterior de Costa Rica se concentró, no se diversificó</h1>
+    <p class="lede">Las exportaciones se duplicaron con creces y al mismo tiempo dependen más de un país y de un producto. Mové el año o tocá ▶ para ver cómo pasó.</p>
+    <div class="meta"><span>Datos: UN COMTRADE</span><span><a href="https://github.com/pabloguerrerocr/comercio-exterior-cr">Código y metodología →</a></span></div>
+  </header>
+
+  <section class="panel" style="display:grid;gap:14px">
+    <div class="controles" style="margin:0">
+      <span class="anio" id="anioV">2024</span>
+      <button class="play" id="play" aria-label="Reproducir">▶</button>
+      <input type="range" id="anio" min="2010" max="2024" step="1" value="2024" aria-label="Año">
+      <div class="seg" id="flujoSeg" role="group" aria-label="Flujo"></div>
+    </div>
+    <div class="cifras" id="cifras"></div>
+  </section>
+
+  <section class="dos">
+    <div class="panel">
+      <div class="cab"><h2 id="tSocios">¿A dónde van las exportaciones?</h2><p>Los 12 mayores socios del año y el resto.</p></div>
+      <svg class="graf" id="socios" viewBox="0 0 520 440"></svg>
+    </div>
+    <div class="panel">
+      <div class="cab"><h2 id="tCap">¿Qué se exporta?</h2><p>Capítulos del sistema armonizado.</p></div>
+      <svg class="graf" id="capitulos" viewBox="0 0 520 440"></svg>
+    </div>
+  </section>
+
+  <section class="dos">
+    <div class="panel">
+      <div class="controles"><div class="seg" id="concSeg" role="group" aria-label="Medida de concentración"></div></div>
+      <div class="cab"><h2 id="tConc">Concentración de los destinos de exportación</h2><p id="pConc"></p></div>
+      <svg class="graf" id="conc" viewBox="0 0 520 300"></svg>
+    </div>
+    <div class="panel">
+      <div class="cab"><h2>Exportaciones e importaciones</h2><p>Miles de millones de dólares. La brecha entre las dos líneas es el déficit comercial de bienes.</p></div>
+      <svg class="graf" id="balanza" viewBox="0 0 520 300"></svg>
+      <div class="leyenda"><span><i style="background:var(--serie-1)"></i>Exportaciones</span><span><i style="background:var(--serie-2)"></i>Importaciones</span></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="cab"><h2>Quién explica el aumento exportador de 2010 a 2024</h2><p>Aporte de cada capítulo al aumento total de las exportaciones.</p></div>
+    <svg class="graf" id="aporte" viewBox="0 0 1000 300"></svg>
+    <p class="limite" style="margin-top:12px">Los valores son los que declara Costa Rica. Sus socios declaran importar bastante más: esa diferencia es el tema de <a href="../brecha/">la brecha espejo</a>.</p>
+  </section>
+
+  <footer class="pie">
+    <span>Pablo Guerrero · Costa Rica</span>
+    <span>Fuente: UN COMTRADE, comercio de bienes de Costa Rica declarado por Costa Rica. Valores en dólares corrientes.</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+// Utilidades comunes de los tableros: formato en español (coma decimal),
+// tooltip y colores leídos de las variables CSS para respetar el tema.
+const nf = (d) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d });
+const num = (v, d = 0) => nf(d).format(v);
+const firmado = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + nf(d).format(Math.abs(v));
+const usdM = v => {
+  const a = Math.abs(v), s = v < 0 ? "−" : "";
+  if (a >= 1e9) return s + "$" + nf(a >= 1e10 ? 1 : 2).format(a / 1e9) + " mm";
+  if (a >= 1e6) return s + "$" + nf(0).format(a / 1e6) + " M";
+  return s + "$" + nf(0).format(a / 1e3) + " mil";
+};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+const tip = d3.select("body").append("div").attr("class", "tip").attr("hidden", true);
+function mostrarTip(e, titulo, filas) {
+  tip.attr("hidden", null).html(`<b>${titulo}</b>` + filas.map(f => `<div class="f"><span>${f[0]}</span><span>${f[1]}</span></div>`).join(""));
+  const t = tip.node();
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + t.offsetWidth > innerWidth - 8) x = e.clientX - t.offsetWidth - 14;
+  if (y + t.offsetHeight > innerHeight - 8) y = e.clientY - t.offsetHeight - 14;
+  tip.style("left", Math.max(4, x) + "px").style("top", Math.max(4, y) + "px");
+}
+const ocultarTip = () => tip.attr("hidden", true);
+
+// Repinta cuando cambia el tema del sistema o el atributo data-theme.
+function alCambiarTema(fn) {
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", fn);
+  new MutationObserver(fn).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+
+// Gráficos anchos: en pantallas angostas se dibujan con menos ancho lógico
+// para que el texto no quede diminuto al escalar el SVG.
+const ancho = (normal = 1000) => innerWidth < 700 ? 560 : normal;
+function alRedimensionar(fn) {
+  let t, ultimo = ancho();
+  addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => { if (ancho() !== ultimo) { ultimo = ancho(); fn(); } }, 150); });
+}
+
+// Botón de reproducción para un deslizador de años.
+function reproductor(boton, deslizador, alCambiar) {
+  let timer = null;
+  const parar = () => { clearInterval(timer); timer = null; boton.text("▶").attr("aria-label", "Reproducir"); };
+  boton.on("click", () => {
+    if (timer) return parar();
+    const n = deslizador.node();
+    if (+n.value >= +n.max) n.value = n.min;
+    boton.text("❚❚").attr("aria-label", "Pausar");
+    timer = setInterval(() => {
+      if (+n.value >= +n.max) return parar();
+      n.value = +n.value + 1; alCambiar(+n.value);
+    }, 700);
+  });
+  deslizador.on("input", e => { parar(); alCambiar(+e.target.value); });
+}
+
+const D = {"balanza":[[2010.0,9.04,13.92,-4.88],[2011.0,10.22,18.26,-8.04],[2012.0,11.25,18.36,-7.11],[2013.0,11.47,18.12,-6.65],[2014.0,11.24,17.18,-5.94],[2015.0,9.58,15.5,-5.93],[2016.0,9.91,15.32,-5.41],[2017.0,11.3,16.35,-5.06],[2018.0,11.25,16.56,-5.31],[2019.0,11.45,16.11,-4.65],[2020.0,11.62,14.46,-2.83],[2021.0,14.35,18.43,-4.08],[2022.0,15.32,21.14,-5.82],[2023.0,18.11,22.51,-4.41],[2024.0,19.88,23.68,-3.79]],"conc":[[2010.0,0.1602,37.4,54.0,74.8],[2011.0,0.1665,38.3,55.5,75.7],[2012.0,0.1671,38.3,55.8,75.6],[2013.0,0.1671,38.3,56.2,76.0],[2014.0,0.1657,38.3,54.2,74.7],[2015.0,0.1851,40.8,57.5,78.3],[2016.0,0.1878,41.0,57.8,79.6],[2017.0,0.1871,40.9,58.3,79.3],[2018.0,0.1885,41.1,58.3,78.5],[2019.0,0.1988,42.3,60.0,79.4],[2020.0,0.2084,43.5,61.6,80.1],[2021.0,0.2094,43.7,61.0,79.7],[2022.0,0.2105,43.8,62.0,80.1],[2023.0,0.2309,46.1,64.0,81.5],[2024.0,0.248,47.9,66.7,82.6]],"socios":[[2010,"Exp","Estados Unidos",3384678655],[2010,"Exp","Países Bajos",633714209],[2010,"Exp","Hong Kong",438037411],[2010,"Exp","Panamá",430186029],[2010,"Exp","Nicaragua",378899543],[2010,"Exp","Guatemala",361679360],[2010,"Exp","Bélgica",311988802],[2010,"Exp","Honduras",292187036],[2010,"Exp","El Salvador",269222229],[2010,"Exp","China",268829122],[2010,"Exp","México",254431438],[2010,"Exp","Rep. Dominicana",241251601],[2010,"Exp","Resto",1779735241],[2010,"Imp","Estados Unidos",6511661094],[2010,"Imp","China",990684895],[2010,"Imp","México",895610565],[2010,"Imp","Japón",499450970],[2010,"Imp","Colombia",499152068],[2010,"Imp","Guatemala",324037728],[2010,"Imp","Áreas no especificadas",312845400],[2010,"Imp","Alemania",310332006],[2010,"Imp","Brasil",294576532],[2010,"Imp","Panamá",235571762],[2010,"Imp","Chile",218985522],[2010,"Imp","Trinidad y Tobago",163164166],[2010,"Imp","Resto",2664171126],[2011,"Exp","Estados Unidos",3911308226],[2011,"Exp","Países Bajos",686182872],[2011,"Exp","Panamá",559891607],[2011,"Exp","Hong Kong",516963347],[2011,"Exp","Nicaragua",455801412],[2011,"Exp","Guatemala",407526368],[2011,"Exp","Honduras",336175467],[2011,"Exp","México",307055574],[2011,"Exp","El Salvador",285843453],[2011,"Exp","Bélgica",274329391],[2011,"Exp","Reino Unido",255436367],[2011,"Exp","Rep. Dominicana",251761474],[2011,"Exp","Resto",1973965468],[2011,"Imp","Estados Unidos",8321502770],[2011,"Imp","China",1528462904],[2011,"Imp","México",1220644520],[2011,"Imp","Japón",688732206],[2011,"Imp","Colombia",655853995],[2011,"Imp","Guatemala",457271387],[2011,"Imp","Alemania",421327126],[2011,"Imp","Panamá",398146627],[2011,"Imp","Brasil",351742746],[2011,"Imp","Chile",265143948],[2011,"Imp","Nicaragua",257658294],[2011,"Imp","Áreas no especificadas",235412429],[2011,"Imp","Resto",3461906019],[2012,"Exp","Estados Unidos",4306806171],[2012,"Exp","Países Bajos",850040414],[2012,"Exp","Panamá",583898983],[2012,"Exp","Hong Kong",533407942],[2012,"Exp","Nicaragua",501326930],[2012,"Exp","Guatemala",432467452],[2012,"Exp","Honduras",349379862],[2012,"Exp","China",326670235],[2012,"Exp","México",314872814],[2012,"Exp","El Salvador",305040735],[2012,"Exp","Bélgica",280446830],[2012,"Exp","Rep. Dominicana",259186649],[2012,"Exp","Resto",2207258881],[2012,"Imp","Estados Unidos",9519474368],[2012,"Imp","China",1446073360],[2012,"Imp","México",1187066499],[2012,"Imp","Japón",560594540],[2012,"Imp","Panamá",530786316],[2012,"Imp","Brasil",424196251],[2012,"Imp","Guatemala",416945916],[2012,"Imp","Colombia",342847834],[2012,"Imp","Alemania",317516428],[2012,"Imp","Chile",290949298],[2012,"Imp","Corea del Sur",278748676],[2012,"Imp","Canadá",235724706],[2012,"Imp","Resto",2805068598],[2013,"Exp","Estados Unidos",4390841832],[2013,"Exp","Países Bajos",829672372],[2013,"Exp","Hong Kong",648030593],[2013,"Exp","Panamá",580113833],[2013,"Exp","Nicaragua",498343715],[2013,"Exp","Guatemala",450997756],[2013,"Exp","China",377803764],[2013,"Exp","Honduras",322830287],[2013,"Exp","El Salvador",311687812],[2013,"Exp","Bélgica",309594546],[2013,"Exp","Malasia",291245037],[2013,"Exp","México",255321104],[2013,"Exp","Resto",2205580874],[2013,"Imp","Estados Unidos",9062536010],[2013,"Imp","China",1748359667],[2013,"Imp","México",1155030119],[2013,"Imp","Japón",525856446],[2013,"Imp","Guatemala",387393484],[2013,"Imp","Brasil",383383532],[2013,"Imp","Colombia",358481551],[2013,"Imp","Panamá",342556891],[2013,"Imp","Alemania",338874275],[2013,"Imp","Corea del Sur",329612712],[2013,"Imp","Chile",271098937],[2013,"Imp","El Salvador",248736026],[2013,"Imp","Resto",2972549604],[2014,"Exp","Estados Unidos",4308664480],[2014,"Exp","Países Bajos",695672612],[2014,"Exp","Panamá",593222716],[2014,"Exp","Nicaragua",498018678],[2014,"Exp","Guatemala",465482947],[2014,"Exp","Hong Kong",413448169],[2014,"Exp","Malasia",400827577],[2014,"Exp","Bélgica",368962483],[2014,"Exp","China",339144698],[2014,"Exp","Honduras",319392106],[2014,"Exp","El Salvador",284788413],[2014,"Exp","Rep. Dominicana",267169930],[2014,"Exp","Resto",2287866246],[2014,"Imp","Estados Unidos",7632705276],[2014,"Imp","China",1715659781],[2014,"Imp","México",1147125898],[2014,"Imp","Japón",475323884],[2014,"Imp","Áreas no especificadas",461342719],[2014,"Imp","Guatemala",408973383],[2014,"Imp","Alemania",360384912],[2014,"Imp","Panamá",355633979],[2014,"Imp","Corea del Sur",326413265],[2014,"Imp","Colombia",316703975],[2014,"Imp","Chile",277397583],[2014,"Imp","Brasil",272704627],[2014,"Imp","Resto",3434543396],[2015,"Exp","Estados Unidos",3903662102],[2015,"Exp","Panamá",558579995],[2015,"Exp","Guatemala",523862138],[2015,"Exp","Nicaragua",522651156],[2015,"Exp","Países Bajos",440009480],[2015,"Exp","Bélgica",430357380],[2015,"Exp","Honduras",332821026],[2015,"Exp","El Salvador",285428682],[2015,"Exp","Rep. Dominicana",265836363],[2015,"Exp","México",239525417],[2015,"Exp","Reino Unido",177502203],[2015,"Exp","Italia",170745660],[2015,"Exp","Resto",1727356178],[2015,"Imp","Estados Unidos",6164438077],[2015,"Imp","China",1947535997],[2015,"Imp","México",1153294267],[2015,"Imp","Japón",418780252],[2015,"Imp","Guatemala",399176770],[2015,"Imp","Corea del Sur",391010704],[2015,"Imp","Alemania",378493137],[2015,"Imp","Áreas no especificadas",356197128],[2015,"Imp","Colombia",306993434],[2015,"Imp","Brasil",296025974],[2015,"Imp","Panamá",285579660],[2015,"Imp","Chile",268441317],[2015,"Imp","Resto",3138456037],[2016,"Exp","Estados Unidos",4058038120],[2016,"Exp","Países Bajos",575437869],[2016,"Exp","Panamá",561017178],[2016,"Exp","Bélgica",532214175],[2016,"Exp","Nicaragua",517296834],[2016,"Exp","Guatemala",516339788],[2016,"Exp","Honduras",334816183],[2016,"Exp","El Salvador",274153745],[2016,"Exp","Rep. Dominicana",258907565],[2016,"Exp","México",257203621],[2016,"Exp","Italia",207836033],[2016,"Exp","Reino Unido",180904418],[2016,"Exp","Resto",1633708292],[2016,"Imp","Estados Unidos",5711167765],[2016,"Imp","China",2082231063],[2016,"Imp","México",1067139860],[2016,"Imp","Áreas no especificadas",485098323],[2016,"Imp","Guatemala",416693417],[2016,"Imp","Japón",415049859],[2016,"Imp","Alemania",388285759],[2016,"Imp","Brasil",330051746],[2016,"Imp","Colombia",292704329],[2016,"Imp","Panamá",290874521],[2016,"Imp","Chile",282376334],[2016,"Imp","Corea del Sur",256938899],[2016,"Imp","Resto",3302900415],[2017,"Exp","Estados Unidos",4616173282],[2017,"Exp","Bélgica",728923066],[2017,"Exp","Países Bajos",633855823],[2017,"Exp","Panamá",611417920],[2017,"Exp","Nicaragua",572925799],[2017,"Exp","Guatemala",560374798],[2017,"Exp","Honduras",389995854],[2017,"Exp","El Salvador",305258099],[2017,"Exp","México",292367176],[2017,"Exp","Rep. Dominicana",245493339],[2017,"Exp","Reino Unido",219288745],[2017,"Exp","Japón",183219994],[2017,"Exp","Resto",1937346534],[2017,"Imp","Estados Unidos",6273654593],[2017,"Imp","China",2142616943],[2017,"Imp","México",1152362475],[2017,"Imp","Áreas no especificadas",509739825],[2017,"Imp","Guatemala",433341962],[2017,"Imp","Alemania",415365876],[2017,"Imp","Japón",397506601],[2017,"Imp","Brasil",315161030],[2017,"Imp","Colombia",307482876],[2017,"Imp","España",289491369],[2017,"Imp","Chile",287728209],[2017,"Imp","Panamá",275899659],[2017,"Imp","Resto",3551998946],[2018,"Exp","Estados Unidos",4624930972],[2018,"Exp","Países Bajos",679000696],[2018,"Exp","Bélgica",675369118],[2018,"Exp","Panamá",580683325],[2018,"Exp","Guatemala",570941867],[2018,"Exp","Nicaragua",481188823],[2018,"Exp","Honduras",394184976],[2018,"Exp","El Salvador",295756382],[2018,"Exp","México",284997911],[2018,"Exp","Rep. Dominicana",242284370],[2018,"Exp","Japón",240770436],[2018,"Exp","Reino Unido",202205605],[2018,"Exp","Resto",1979466969],[2018,"Imp","Estados Unidos",6476089800],[2018,"Imp","China",2271148008],[2018,"Imp","México",1166907275],[2018,"Imp","Guatemala",415226097],[2018,"Imp","Alemania",414751837],[2018,"Imp","Áreas no especificadas",412006859],[2018,"Imp","Japón",372114334],[2018,"Imp","Brasil",349801074],[2018,"Imp","Colombia",307671798],[2018,"Imp","Hong Kong",290057017],[2018,"Imp","Chile",279287084],[2018,"Imp","España",259688957],[2018,"Imp","Resto",3548269116],[2019,"Exp","Estados Unidos",4849088226],[2019,"Exp","Países Bajos",720812584],[2019,"Exp","Bélgica",706370053],[2019,"Exp","Guatemala",595427859],[2019,"Exp","Panamá",591617066],[2019,"Exp","Nicaragua",453334193],[2019,"Exp","Honduras",394846531],[2019,"Exp","El Salvador",309334635],[2019,"Exp","Japón",243809851],[2019,"Exp","Rep. Dominicana",233785003],[2019,"Exp","México",225730520],[2019,"Exp","Reino Unido",222184292],[2019,"Exp","Resto",1905652264],[2019,"Imp","Estados Unidos",6190668469],[2019,"Imp","China",2123512275],[2019,"Imp","México",1087646195],[2019,"Imp","Áreas no especificadas",506161148],[2019,"Imp","Guatemala",398643699],[2019,"Imp","Alemania",384581629],[2019,"Imp","Japón",353553332],[2019,"Imp","Brasil",348364439],[2019,"Imp","Colombia",318160613],[2019,"Imp","España",258465254],[2019,"Imp","Países Bajos",242467034],[2019,"Imp","El Salvador",232323303],[2019,"Imp","Resto",3661726992],[2020,"Exp","Estados Unidos",5054527599],[2020,"Exp","Países Bajos",895904603],[2020,"Exp","Bélgica",613658355],[2020,"Exp","Guatemala",596434642],[2020,"Exp","Panamá",485341646],[2020,"Exp","Nicaragua",461343180],[2020,"Exp","Honduras",371708826],[2020,"Exp","El Salvador",313292172],[2020,"Exp","Japón",258153744],[2020,"Exp","México",254228628],[2020,"Exp","Rep. Dominicana",231487465],[2020,"Exp","Reino Unido",231286909],[2020,"Exp","Resto",1855387386],[2020,"Imp","Estados Unidos",5401426379],[2020,"Imp","China",2091009286],[2020,"Imp","México",976557470],[2020,"Imp","Guatemala",408058928],[2020,"Imp","Alemania",382555625],[2020,"Imp","Brasil",305761618],[2020,"Imp","Japón",303088602],[2020,"Imp","Colombia",281634058],[2020,"Imp","Áreas no especificadas",274520249],[2020,"Imp","España",248950132],[2020,"Imp","El Salvador",205197291],[2020,"Imp","Chile",201647199],[2020,"Imp","Resto",3375722166],[2021,"Exp","Estados Unidos",6269772002],[2021,"Exp","Países Bajos",1036715626],[2021,"Exp","Bélgica",748487403],[2021,"Exp","Guatemala",701070047],[2021,"Exp","Panamá",582801718],[2021,"Exp","Nicaragua",579914530],[2021,"Exp","Honduras",478310581],[2021,"Exp","El Salvador",366919379],[2021,"Exp","México",355288322],[2021,"Exp","Rep. Dominicana",313840263],[2021,"Exp","China",308630802],[2021,"Exp","Japón",258321451],[2021,"Exp","Resto",2345323441],[2021,"Imp","Estados Unidos",6957320955],[2021,"Imp","China",2937920959],[2021,"Imp","México",1183216303],[2021,"Imp","Guatemala",500399065],[2021,"Imp","Alemania",417410355],[2021,"Imp","Brasil",408688876],[2021,"Imp","Japón",369048059],[2021,"Imp","España",353552382],[2021,"Imp","Colombia",342334579],[2021,"Imp","Chile",274167842],[2021,"Imp","Costa Rica",266073595],[2021,"Imp","El Salvador",240208567],[2021,"Imp","Resto",4177772304],[2022,"Exp","Estados Unidos",6704065665],[2022,"Exp","Países Bajos",1183244234],[2022,"Exp","Guatemala",815131696],[2022,"Exp","Bélgica",792443933],[2022,"Exp","Nicaragua",593427034],[2022,"Exp","Panamá",588407695],[2022,"Exp","Honduras",517325873],[2022,"Exp","El Salvador",385793419],[2022,"Exp","México",348300785],[2022,"Exp","China",344411382],[2022,"Exp","Rep. Dominicana",341997173],[2022,"Exp","Japón",255573441],[2022,"Exp","Resto",2449572740],[2022,"Imp","Estados Unidos",8198695979],[2022,"Imp","China",3186227318],[2022,"Imp","México",1318374864],[2022,"Imp","Guatemala",570176776],[2022,"Imp","Brasil",546889054],[2022,"Imp","Alemania",498931566],[2022,"Imp","Japón",434236460],[2022,"Imp","Colombia",408511125],[2022,"Imp","España",376269114],[2022,"Imp","Chile",356620583],[2022,"Imp","El Salvador",277575338],[2022,"Imp","Costa Rica",255938070],[2022,"Imp","Resto",4711883683],[2023,"Exp","Estados Unidos",8344832017],[2023,"Exp","Países Bajos",1514509150],[2023,"Exp","Guatemala",887998387],[2023,"Exp","Bélgica",839061128],[2023,"Exp","Nicaragua",692530662],[2023,"Exp","Panamá",625847210],[2023,"Exp","Honduras",598223434],[2023,"Exp","El Salvador",458736597],[2023,"Exp","China",416663777],[2023,"Exp","Japón",379839155],[2023,"Exp","Rep. Dominicana",319699905],[2023,"Exp","España",303756373],[2023,"Exp","Resto",2724206879],[2023,"Imp","Estados Unidos",8601480330],[2023,"Imp","China",3393315348],[2023,"Imp","México",1438218137],[2023,"Imp","Brasil",659799626],[2023,"Imp","Guatemala",598118669],[2023,"Imp","Alemania",557394997],[2023,"Imp","Japón",465611765],[2023,"Imp","Colombia",401974461],[2023,"Imp","España",388923942],[2023,"Imp","Chile",331995530],[2023,"Imp","Panamá",293437663],[2023,"Imp","Italia",291262306],[2023,"Imp","Resto",5090573446],[2024,"Exp","Estados Unidos",9527331703],[2024,"Exp","Países Bajos",1714447314],[2024,"Exp","Guatemala",1027311339],[2024,"Exp","Bélgica",986903380],[2024,"Exp","Nicaragua",737246162],[2024,"Exp","Panamá",613515486],[2024,"Exp","Honduras",597351714],[2024,"Exp","El Salvador",499547753],[2024,"Exp","China",383469164],[2024,"Exp","México",332171417],[2024,"Exp","Rep. Dominicana",318076804],[2024,"Exp","España",286409429],[2024,"Exp","Resto",2858534192],[2024,"Imp","Estados Unidos",8649621354],[2024,"Imp","China",4037317476],[2024,"Imp","México",1518753133],[2024,"Imp","Brasil",683886782],[2024,"Imp","Guatemala",621656127],[2024,"Imp","Japón",607415217],[2024,"Imp","Alemania",565773970],[2024,"Imp","Colombia",425343505],[2024,"Imp","España",418031246],[2024,"Imp","Panamá",379604976],[2024,"Imp","Chile",370211997],[2024,"Imp","Países Bajos",348107811],[2024,"Imp","Resto",5049959209]],"capitulos":[[2010,"Exp","Frutas",1506519869],[2010,"Exp","Máquinas y aparatos eléctricos",1424171054],[2010,"Exp","Instrumentos médicos y de precisión",1101881121],[2010,"Exp","Maquinaria y reactores",956042117],[2010,"Exp","Preparaciones alimenticias diversas",350295849],[2010,"Exp","Productos farmacéuticos",300752237],[2010,"Exp","Café, té y especias",269093324],[2010,"Exp","Plásticos",231492355],[2010,"Exp","Caucho",211691627],[2010,"Exp","Preparaciones de frutas y hortalizas",199122432],[2010,"Exp","Papel y cartón",189210892],[2010,"Exp","Trees and other plants, live",171748282],[2010,"Exp","Resto",2132819516],[2010,"Imp","Máquinas y aparatos eléctricos",2683310765],[2010,"Imp","Combustibles",1708827727],[2010,"Imp","Maquinaria y reactores",1276314178],[2010,"Imp","Plásticos",820822339],[2010,"Imp","Vehículos",714302807],[2010,"Imp","Papel y cartón",520326700],[2010,"Imp","Productos farmacéuticos",518927669],[2010,"Imp","Hierro y acero",417207183],[2010,"Imp","Mercancías no especificadas",390874692],[2010,"Imp","Instrumentos médicos y de precisión",352488793],[2010,"Imp","Manufacturas de hierro o acero",295800851],[2010,"Imp","Chemical products n.e.c.",257142486],[2010,"Imp","Resto",3963897641],[2011,"Exp","Máquinas y aparatos eléctricos",2479941350],[2011,"Exp","Frutas",1571657320],[2011,"Exp","Instrumentos médicos y de precisión",1197690656],[2011,"Exp","Café, té y especias",382909176],[2011,"Exp","Preparaciones alimenticias diversas",381419252],[2011,"Exp","Productos farmacéuticos",324108421],[2011,"Exp","Plásticos",323217094],[2011,"Exp","Preparaciones de frutas y hortalizas",255521443],[2011,"Exp","Grasas y aceites",249555730],[2011,"Exp","Caucho",240343630],[2011,"Exp","Papel y cartón",207040973],[2011,"Exp","Maquinaria y reactores",172247680],[2011,"Exp","Resto",2436588304],[2011,"Imp","Máquinas y aparatos eléctricos",3513684079],[2011,"Imp","Combustibles",2298759960],[2011,"Imp","Maquinaria y reactores",1687461629],[2011,"Imp","Vehículos",1461435392],[2011,"Imp","Plásticos",1130182219],[2011,"Imp","Papel y cartón",609741118],[2011,"Imp","Productos farmacéuticos",568612017],[2011,"Imp","Hierro y acero",528431448],[2011,"Imp","Instrumentos médicos y de precisión",499033656],[2011,"Imp","Manufacturas de hierro o acero",493265206],[2011,"Imp","Cereales",316590106],[2011,"Imp","Chemical products n.e.c.",266038163],[2011,"Imp","Resto",4890569978],[2012,"Exp","Máquinas y aparatos eléctricos",2809707712],[2012,"Exp","Frutas",1636434348],[2012,"Exp","Instrumentos médicos y de precisión",1364413767],[2012,"Exp","Café, té y especias",428344587],[2012,"Exp","Preparaciones alimenticias diversas",394040051],[2012,"Exp","Plásticos",373087050],[2012,"Exp","Preparaciones de frutas y hortalizas",282644662],[2012,"Exp","Hierro y acero",265373799],[2012,"Exp","Grasas y aceites",237046139],[2012,"Exp","Productos farmacéuticos",224387394],[2012,"Exp","Caucho",223359462],[2012,"Exp","Maquinaria y reactores",177657725],[2012,"Exp","Resto",2834307196],[2012,"Imp","Máquinas y aparatos eléctricos",3739465138],[2012,"Imp","Combustibles",2325792018],[2012,"Imp","Maquinaria y reactores",1358674760],[2012,"Imp","Vehículos",1046062468],[2012,"Imp","Plásticos",1009217318],[2012,"Imp","Instrumentos médicos y de precisión",617315074],[2012,"Imp","Hierro y acero",582067674],[2012,"Imp","Papel y cartón",560231147],[2012,"Imp","Productos farmacéuticos",546414609],[2012,"Imp","Manufacturas de hierro o acero",418462667],[2012,"Imp","Cereales",325249251],[2012,"Imp","Chemical products n.e.c.",296018500],[2012,"Imp","Resto",5531022167],[2013,"Exp","Máquinas y aparatos eléctricos",3113964980],[2013,"Exp","Frutas",1741626612],[2013,"Exp","Instrumentos médicos y de precisión",1516811300],[2013,"Exp","Preparaciones alimenticias diversas",450138413],[2013,"Exp","Plásticos",378261084],[2013,"Exp","Preparaciones de frutas y hortalizas",335171194],[2013,"Exp","Café, té y especias",313204193],[2013,"Exp","Caucho",249530990],[2013,"Exp","Productos farmacéuticos",234995643],[2013,"Exp","Grasas y aceites",190640917],[2013,"Exp","Maquinaria y reactores",163292688],[2013,"Exp","Trees and other plants, live",155250299],[2013,"Exp","Resto",2629175218],[2013,"Imp","Máquinas y aparatos eléctricos",3796742654],[2013,"Imp","Combustibles",2310558242],[2013,"Imp","Maquinaria y reactores",1411147031],[2013,"Imp","Plásticos",1072160770],[2013,"Imp","Vehículos",1009149623],[2013,"Imp","Papel y cartón",614305654],[2013,"Imp","Productos farmacéuticos",582394379],[2013,"Imp","Instrumentos médicos y de precisión",526698421],[2013,"Imp","Hierro y acero",460081157],[2013,"Imp","Manufacturas de hierro o acero",430245059],[2013,"Imp","Cereales",330896202],[2013,"Imp","Chemical products n.e.c.",292071491],[2013,"Imp","Resto",5288018568],[2014,"Exp","Máquinas y aparatos eléctricos",2421358174],[2014,"Exp","Frutas",1960791308],[2014,"Exp","Instrumentos médicos y de precisión",1836958492],[2014,"Exp","Preparaciones alimenticias diversas",482911804],[2014,"Exp","Plásticos",389614007],[2014,"Exp","Preparaciones de frutas y hortalizas",327534861],[2014,"Exp","Café, té y especias",290457177],[2014,"Exp","Caucho",248802021],[2014,"Exp","Productos farmacéuticos",231255944],[2014,"Exp","Maquinaria y reactores",198876745],[2014,"Exp","Grasas y aceites",175309217],[2014,"Exp","Dairy produce",152060832],[2014,"Exp","Resto",2526730465],[2014,"Imp","Máquinas y aparatos eléctricos",2829494990],[2014,"Imp","Combustibles",2231920681],[2014,"Imp","Maquinaria y reactores",1433613080],[2014,"Imp","Plásticos",1198127194],[2014,"Imp","Vehículos",1049448140],[2014,"Imp","Productos farmacéuticos",629955459],[2014,"Imp","Papel y cartón",607087813],[2014,"Imp","Hierro y acero",480414258],[2014,"Imp","Instrumentos médicos y de precisión",453558333],[2014,"Imp","Manufacturas de hierro o acero",440534269],[2014,"Imp","Cereales",318679642],[2014,"Imp","Chemical products n.e.c.",311428186],[2014,"Imp","Resto",5200650632],[2015,"Exp","Instrumentos médicos y de precisión",2219020536],[2015,"Exp","Frutas",1822627637],[2015,"Exp","Máquinas y aparatos eléctricos",642644140],[2015,"Exp","Preparaciones alimenticias diversas",510607914],[2015,"Exp","Plásticos",358081815],[2015,"Exp","Preparaciones de frutas y hortalizas",353915371],[2015,"Exp","Café, té y especias",313923905],[2015,"Exp","Productos farmacéuticos",255976773],[2015,"Exp","Caucho",236115759],[2015,"Exp","Grasas y aceites",150184277],[2015,"Exp","Trees and other plants, live",147548125],[2015,"Exp","Hortalizas",145761662],[2015,"Exp","Resto",2421929864],[2015,"Imp","Máquinas y aparatos eléctricos",1865032130],[2015,"Imp","Maquinaria y reactores",1350031144],[2015,"Imp","Combustibles",1340593021],[2015,"Imp","Vehículos",1299793018],[2015,"Imp","Plásticos",1185577208],[2015,"Imp","Productos farmacéuticos",671207049],[2015,"Imp","Papel y cartón",579607144],[2015,"Imp","Instrumentos médicos y de precisión",552582660],[2015,"Imp","Hierro y acero",437266298],[2015,"Imp","Manufacturas de hierro o acero",428376893],[2015,"Imp","Chemical products n.e.c.",312875379],[2015,"Imp","Cereales",294948382],[2015,"Imp","Resto",5186532433],[2016,"Exp","Instrumentos médicos y de precisión",2597993267],[2016,"Exp","Frutas",2066779303],[2016,"Exp","Preparaciones alimenticias diversas",503690486],[2016,"Exp","Preparaciones de frutas y hortalizas",463300597],[2016,"Exp","Máquinas y aparatos eléctricos",436265358],[2016,"Exp","Plásticos",347185366],[2016,"Exp","Café, té y especias",315631569],[2016,"Exp","Productos farmacéuticos",266717838],[2016,"Exp","Caucho",228274528],[2016,"Exp","Hortalizas",154739100],[2016,"Exp","Grasas y aceites",147115938],[2016,"Exp","Dairy produce",143387900],[2016,"Exp","Resto",2236792568],[2016,"Imp","Máquinas y aparatos eléctricos",1563959482],[2016,"Imp","Vehículos",1486980402],[2016,"Imp","Maquinaria y reactores",1380350820],[2016,"Imp","Plásticos",1197551567],[2016,"Imp","Combustibles",1181868175],[2016,"Imp","Productos farmacéuticos",718560592],[2016,"Imp","Papel y cartón",625797138],[2016,"Imp","Instrumentos médicos y de precisión",549746862],[2016,"Imp","Hierro y acero",414958335],[2016,"Imp","Manufacturas de hierro o acero",399042609],[2016,"Imp","Chemical products n.e.c.",316067471],[2016,"Imp","Cereales",296089782],[2016,"Imp","Resto",5190539058],[2017,"Exp","Instrumentos médicos y de precisión",3053462740],[2017,"Exp","Frutas",2347433378],[2017,"Exp","Preparaciones alimenticias diversas",561828426],[2017,"Exp","Máquinas y aparatos eléctricos",510347005],[2017,"Exp","Preparaciones de frutas y hortalizas",446329398],[2017,"Exp","Plásticos",373043617],[2017,"Exp","Café, té y especias",337922693],[2017,"Exp","Productos farmacéuticos",299818911],[2017,"Exp","Caucho",279184594],[2017,"Exp","Grasas y aceites",181797592],[2017,"Exp","Hierro y acero",169146508],[2017,"Exp","Hortalizas",163715547],[2017,"Exp","Resto",2572610019],[2017,"Imp","Máquinas y aparatos eléctricos",1692440549],[2017,"Imp","Combustibles",1529050262],[2017,"Imp","Maquinaria y reactores",1452445258],[2017,"Imp","Vehículos",1346341139],[2017,"Imp","Plásticos",1272810117],[2017,"Imp","Productos farmacéuticos",809971236],[2017,"Imp","Papel y cartón",656326125],[2017,"Imp","Instrumentos médicos y de precisión",601706918],[2017,"Imp","Hierro y acero",489971680],[2017,"Imp","Manufacturas de hierro o acero",445211646],[2017,"Imp","Chemical products n.e.c.",329206266],[2017,"Imp","Cereales",312492367],[2017,"Imp","Resto",5414376803],[2018,"Exp","Instrumentos médicos y de precisión",3284132378],[2018,"Exp","Frutas",2243247974],[2018,"Exp","Preparaciones alimenticias diversas",558942698],[2018,"Exp","Máquinas y aparatos eléctricos",518644866],[2018,"Exp","Preparaciones de frutas y hortalizas",374946552],[2018,"Exp","Plásticos",367070316],[2018,"Exp","Café, té y especias",326223310],[2018,"Exp","Productos farmacéuticos",316019305],[2018,"Exp","Caucho",285496812],[2018,"Exp","Grasas y aceites",179685470],[2018,"Exp","Hierro y acero",172826897],[2018,"Exp","Hortalizas",160520489],[2018,"Exp","Resto",2464024383],[2018,"Imp","Combustibles",1717095715],[2018,"Imp","Máquinas y aparatos eléctricos",1693995915],[2018,"Imp","Maquinaria y reactores",1497413249],[2018,"Imp","Plásticos",1336724826],[2018,"Imp","Vehículos",1127101875],[2018,"Imp","Productos farmacéuticos",776942194],[2018,"Imp","Papel y cartón",683690938],[2018,"Imp","Hierro y acero",634998016],[2018,"Imp","Instrumentos médicos y de precisión",614854910],[2018,"Imp","Manufacturas de hierro o acero",444403074],[2018,"Imp","Chemical products n.e.c.",327868251],[2018,"Imp","Cereales",320426002],[2018,"Imp","Resto",5387504291],[2019,"Exp","Instrumentos médicos y de precisión",3650042884],[2019,"Exp","Frutas",2159022579],[2019,"Exp","Preparaciones alimenticias diversas",593870712],[2019,"Exp","Máquinas y aparatos eléctricos",471593440],[2019,"Exp","Plásticos",378905046],[2019,"Exp","Preparaciones de frutas y hortalizas",334587580],[2019,"Exp","Productos farmacéuticos",324963703],[2019,"Exp","Café, té y especias",285592000],[2019,"Exp","Caucho",270324409],[2019,"Exp","Hortalizas",172184871],[2019,"Exp","Manufacturas diversas",162005225],[2019,"Exp","Dairy produce",158532617],[2019,"Exp","Resto",2490368010],[2019,"Imp","Combustibles",1689749945],[2019,"Imp","Máquinas y aparatos eléctricos",1630330393],[2019,"Imp","Plásticos",1394006505],[2019,"Imp","Maquinaria y reactores",1338210898],[2019,"Imp","Vehículos",957423462],[2019,"Imp","Productos farmacéuticos",818632178],[2019,"Imp","Instrumentos médicos y de precisión",794028286],[2019,"Imp","Papel y cartón",655047925],[2019,"Imp","Hierro y acero",489333295],[2019,"Imp","Manufacturas de hierro o acero",487870158],[2019,"Imp","Cereales",341150428],[2019,"Imp","Chemical products n.e.c.",321799858],[2019,"Imp","Resto",5188691051],[2020,"Exp","Instrumentos médicos y de precisión",3926732997],[2020,"Exp","Frutas",2174539198],[2020,"Exp","Preparaciones alimenticias diversas",610095034],[2020,"Exp","Máquinas y aparatos eléctricos",428841919],[2020,"Exp","Productos farmacéuticos",381100312],[2020,"Exp","Plásticos",354484586],[2020,"Exp","Preparaciones de frutas y hortalizas",346879617],[2020,"Exp","Café, té y especias",340530945],[2020,"Exp","Caucho",226002661],[2020,"Exp","Grasas y aceites",192264497],[2020,"Exp","Hortalizas",170005740],[2020,"Exp","Dairy produce",144563894],[2020,"Exp","Resto",2326713754],[2020,"Imp","Máquinas y aparatos eléctricos",1430390985],[2020,"Imp","Maquinaria y reactores",1385891310],[2020,"Imp","Plásticos",1220756256],[2020,"Imp","Combustibles",936742547],[2020,"Imp","Instrumentos médicos y de precisión",915548750],[2020,"Imp","Productos farmacéuticos",845922446],[2020,"Imp","Vehículos",693084371],[2020,"Imp","Papel y cartón",589795832],[2020,"Imp","Hierro y acero",458577686],[2020,"Imp","Manufacturas de hierro o acero",376461507],[2020,"Imp","Chemical products n.e.c.",359868802],[2020,"Imp","Cereales",355297550],[2020,"Imp","Resto",4887790961],[2021,"Exp","Instrumentos médicos y de precisión",5183763962],[2021,"Exp","Frutas",2317070169],[2021,"Exp","Preparaciones alimenticias diversas",780545818],[2021,"Exp","Máquinas y aparatos eléctricos",614985077],[2021,"Exp","Plásticos",446929778],[2021,"Exp","Preparaciones de frutas y hortalizas",412731637],[2021,"Exp","Café, té y especias",341218042],[2021,"Exp","Productos farmacéuticos",317552137],[2021,"Exp","Grasas y aceites",300900893],[2021,"Exp","Hierro y acero",295582015],[2021,"Exp","Caucho",295571528],[2021,"Exp","Hortalizas",183598448],[2021,"Exp","Resto",2854946061],[2021,"Imp","Máquinas y aparatos eléctricos",1723705600],[2021,"Imp","Combustibles",1706346926],[2021,"Imp","Maquinaria y reactores",1586300895],[2021,"Imp","Plásticos",1571532648],[2021,"Imp","Instrumentos médicos y de precisión",980233920],[2021,"Imp","Vehículos",954648597],[2021,"Imp","Hierro y acero",912564085],[2021,"Imp","Productos farmacéuticos",905026950],[2021,"Imp","Papel y cartón",732613693],[2021,"Imp","Cereales",490249110],[2021,"Imp","Manufacturas de hierro o acero",482941995],[2021,"Imp","Chemical products n.e.c.",408362404],[2021,"Imp","Resto",5973587018],[2022,"Exp","Instrumentos médicos y de precisión",5737157299],[2022,"Exp","Frutas",2228445258],[2022,"Exp","Preparaciones alimenticias diversas",878706503],[2022,"Exp","Máquinas y aparatos eléctricos",655227714],[2022,"Exp","Plásticos",466101890],[2022,"Exp","Preparaciones de frutas y hortalizas",442723760],[2022,"Exp","Café, té y especias",381951959],[2022,"Exp","Caucho",329527193],[2022,"Exp","Productos farmacéuticos",327143393],[2022,"Exp","Grasas y aceites",322532037],[2022,"Exp","Hierro y acero",258415158],[2022,"Exp","Hortalizas",198827602],[2022,"Exp","Resto",3092935303],[2022,"Imp","Combustibles",2692919543],[2022,"Imp","Máquinas y aparatos eléctricos",1830345271],[2022,"Imp","Maquinaria y reactores",1821265274],[2022,"Imp","Plásticos",1665439871],[2022,"Imp","Vehículos",1156892978],[2022,"Imp","Instrumentos médicos y de precisión",1041808309],[2022,"Imp","Productos farmacéuticos",1028252679],[2022,"Imp","Papel y cartón",907323199],[2022,"Imp","Hierro y acero",883476111],[2022,"Imp","Cereales",502555968],[2022,"Imp","Manufacturas de hierro o acero",486645387],[2022,"Imp","Chemical products n.e.c.",469376398],[2022,"Imp","Resto",6654028942],[2023,"Exp","Instrumentos médicos y de precisión",7605364593],[2023,"Exp","Frutas",2532396298],[2023,"Exp","Preparaciones alimenticias diversas",1007682637],[2023,"Exp","Máquinas y aparatos eléctricos",804762715],[2023,"Exp","Plásticos",519988113],[2023,"Exp","Preparaciones de frutas y hortalizas",440224013],[2023,"Exp","Productos farmacéuticos",412509844],[2023,"Exp","Café, té y especias",359350536],[2023,"Exp","Caucho",348283802],[2023,"Exp","Grasas y aceites",312632297],[2023,"Exp","Hortalizas",265021732],[2023,"Exp","Hierro y acero",253617248],[2023,"Exp","Resto",3244070847],[2023,"Imp","Combustibles",2587643123],[2023,"Imp","Máquinas y aparatos eléctricos",2199026497],[2023,"Imp","Maquinaria y reactores",1952070041],[2023,"Imp","Plásticos",1733501128],[2023,"Imp","Vehículos",1670350052],[2023,"Imp","Instrumentos médicos y de precisión",1296473116],[2023,"Imp","Productos farmacéuticos",1037178242],[2023,"Imp","Papel y cartón",772755168],[2023,"Imp","Hierro y acero",766518381],[2023,"Imp","Manufacturas de hierro o acero",605475434],[2023,"Imp","Cereales",587793015],[2023,"Imp","Chemical products n.e.c.",420883676],[2023,"Imp","Resto",6882438345],[2024,"Exp","Instrumentos médicos y de precisión",8747615417],[2024,"Exp","Frutas",2778923725],[2024,"Exp","Preparaciones alimenticias diversas",1119864321],[2024,"Exp","Máquinas y aparatos eléctricos",839124047],[2024,"Exp","Plásticos",543966245],[2024,"Exp","Preparaciones de frutas y hortalizas",486413117],[2024,"Exp","Productos farmacéuticos",452495351],[2024,"Exp","Café, té y especias",356420622],[2024,"Exp","Caucho",330108892],[2024,"Exp","Grasas y aceites",289310811],[2024,"Exp","Hortalizas",276061195],[2024,"Exp","Hierro y acero",228566181],[2024,"Exp","Resto",3433445935],[2024,"Imp","Combustibles",2460756242],[2024,"Imp","Máquinas y aparatos eléctricos",2326748100],[2024,"Imp","Vehículos",2183624037],[2024,"Imp","Maquinaria y reactores",2064067499],[2024,"Imp","Plásticos",1719775440],[2024,"Imp","Instrumentos médicos y de precisión",1297839087],[2024,"Imp","Productos farmacéuticos",1122112894],[2024,"Imp","Hierro y acero",811131910],[2024,"Imp","Papel y cartón",759747128],[2024,"Imp","Manufacturas de hierro o acero",556638064],[2024,"Imp","Cereales",538308932],[2024,"Imp","Chemical products n.e.c.",423507211],[2024,"Imp","Resto",7411426258]],"aporte":[["Instrumentos médicos y de precisión",7645734296,70.5],["Frutas",1272403856,11.7],["Preparaciones alimenticias diversas",769568472,7.1],["Plásticos",312473890,2.9],["Preparaciones de frutas y hortalizas",287290685,2.7],["Hortalizas",163767799,1.5],["Productos farmacéuticos",151743114,1.4],["Manufacturas diversas",146460471,1.4]]};
+const AÑOS = D.balanza.map(f => f[0]);
+const FLUJOS = { Exp: "Exportaciones", Imp: "Importaciones" };
+const CONC = {
+  hhi: { i: 1, nombre: "Herfindahl", fmt: v => num(v, 3), texto: "Índice de Herfindahl-Hirschman de destinos: 0 es comercio repartido entre muchos socios, 1 es un solo socio." },
+  top1: { i: 2, nombre: "Estados Unidos", fmt: v => num(v, 1) + " %", texto: "Porcentaje de las exportaciones que va a Estados Unidos, el mayor destino." },
+  top4: { i: 3, nombre: "4 destinos", fmt: v => num(v, 1) + " %", texto: "Porcentaje que se llevan los cuatro mayores destinos." },
+  top10: { i: 4, nombre: "10 destinos", fmt: v => num(v, 1) + " %", texto: "Porcentaje que se llevan los diez mayores destinos." },
+};
+const DESTACA = new Set(["Estados Unidos", "Instrumentos médicos y de precisión"]);
+const estado = { anio: 2024, flujo: "Exp", conc: "hhi" };
+
+d3.select("#flujoSeg").selectAll("button").data(Object.entries(FLUJOS)).join("button").text(d => d[1])
+  .on("click", (e, d) => { estado.flujo = d[0]; pintar(); });
+d3.select("#concSeg").selectAll("button").data(Object.entries(CONC)).join("button").text(d => d[1].nombre)
+  .on("click", (e, d) => { estado.conc = d[0]; pintar(); });
+reproductor(d3.select("#play"), d3.select("#anio"), a => { estado.anio = a; pintar(); });
+
+const delAño = (filas) => filas.filter(f => f[0] === estado.anio && f[1] === estado.flujo).map(f => ({ n: f[2], v: f[3] }));
+
+function cifras() {
+  const b = D.balanza.find(f => f[0] === estado.anio), c = D.conc.find(f => f[0] === estado.anio);
+  const caps = delAño(D.capitulos.map(f => f)), tot = d3.sum(caps, d => d.v);
+  const med = caps.find(d => d.n === "Instrumentos médicos y de precisión");
+  const items = estado.flujo === "Exp" ? [
+    ["$" + num(b[1], 1) + " mm", `exportado en ${estado.anio}`],
+    [num(c[2], 1) + " %", "va a Estados Unidos"],
+    [num(c[1], 3), "Herfindahl de destinos"],
+    [med ? num(med.v / tot * 100, 1) + " %" : "—", "son instrumentos médicos y de precisión"],
+  ] : [
+    ["$" + num(b[2], 1) + " mm", `importado en ${estado.anio}`],
+    [firmado(b[3], 1) + " mm", "saldo comercial de bienes"],
+    [num(b[1] / b[2] * 100, 0) + " %", "de las importaciones se cubre con exportaciones"],
+    (() => { const so = delAño(D.socios), t = d3.sum(so, d => d.v), top = so.filter(d => d.n !== "Resto").sort((a, b) => b.v - a.v)[0];
+             return [num(top.v / t * 100, 1) + " %", `de lo importado viene de ${top.n}`]; })(),
+  ];
+  d3.select("#cifras").selectAll(".cifra").data(items).join(en => { const k = en.append("div").attr("class", "cifra"); k.append("span").attr("class", "v"); k.append("span").attr("class", "l"); return k; })
+    .call(k => { k.select(".v").text(d => d[0]); k.select(".l").text(d => d[1]); });
+}
+
+function barrasH(id, filas) {
+  const g = d3.select(id); g.selectAll("*").remove();
+  const W = 520, H = 440, m = { l: 168, r: 112, t: 4, b: 4 };
+  const tot = d3.sum(filas, d => d.v);
+  const orden = filas.filter(d => d.n !== "Resto").sort((a, b) => b.v - a.v).concat(filas.filter(d => d.n === "Resto"));
+  const y = d3.scaleBand().domain(orden.map(d => d.n)).range([m.t, H - m.b]).padding(0.22);
+  const max = d3.max(D[id === "#socios" ? "socios" : "capitulos"].filter(f => f[1] === estado.flujo && f[2] !== "Resto"), f => f[3]);
+  const x = d3.scaleLinear().domain([0, Math.max(max, d3.max(orden, d => d.v))]).range([m.l, W - m.r]);
+  const fila = g.selectAll("g").data(orden).join("g").attr("transform", d => `translate(0,${y(d.n)})`);
+  fila.append("rect").attr("x", m.l).attr("height", y.bandwidth()).attr("rx", 2)
+    .attr("width", d => Math.max(1, x(d.v) - m.l))
+    .attr("fill", d => d.n === "Resto" ? css("--serie-3") : DESTACA.has(d.n) ? css("--ocre") : css("--serie-1"))
+    .attr("fill-opacity", d => d.n === "Resto" ? 0.45 : 0.9);
+  fila.append("text").attr("class", "et").attr("x", m.l - 8).attr("y", y.bandwidth() / 2).attr("dy", "0.35em").attr("text-anchor", "end")
+    .text(d => d.n.length > 26 ? d.n.slice(0, 25) + "…" : d.n);
+  fila.append("text").attr("class", "et-2").attr("x", d => x(d.v) + 6).attr("y", y.bandwidth() / 2).attr("dy", "0.35em")
+    .text(d => `${usdM(d.v)} · ${num(d.v / tot * 100, 1)} %`);
+  fila.append("rect").attr("x", 0).attr("width", W).attr("height", y.bandwidth()).attr("fill", "transparent")
+    .on("pointermove", (e, d) => mostrarTip(e, d.n, [["Valor", usdM(d.v)], ["Del total del año", num(d.v / tot * 100, 1) + " %"]]))
+    .on("pointerleave", ocultarTip);
+}
+
+function serieAnual(id, series, fmt, dominio) {
+  const g = d3.select(id); g.selectAll("*").remove();
+  const W = 520, H = 300, m = { l: 48, r: 16, t: 12, b: 28 };
+  const x = d3.scaleLinear().domain(d3.extent(AÑOS)).range([m.l, W - m.r]);
+  const y = d3.scaleLinear().domain(dominio || [0, d3.max(series.flatMap(s => s.d.map(p => p[1])))]).nice().range([H - m.b, m.t]);
+  g.append("g").attr("class", "rejilla").selectAll("line").data(y.ticks(5)).join("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y).attr("y2", y);
+  g.append("g").attr("class", "eje").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmt)).call(a => a.select(".domain").remove()).selectAll("text").attr("dx", "-0.4em");
+  g.append("g").attr("class", "eje").attr("transform", `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(7).tickFormat(d3.format("d")).tickSize(0)).call(a => a.select(".domain").remove()).selectAll("text").attr("dy", "1.2em");
+  g.append("line").attr("x1", x(estado.anio)).attr("x2", x(estado.anio)).attr("y1", m.t).attr("y2", H - m.b).attr("stroke", css("--linea")).attr("stroke-width", 2);
+  for (const s of series) {
+    g.append("path").datum(s.d).attr("fill", "none").attr("stroke", css(s.color)).attr("stroke-width", 2.2).attr("d", d3.line().x(p => x(p[0])).y(p => y(p[1])));
+    const p = s.d.find(p => p[0] === estado.anio);
+    g.append("circle").attr("cx", x(p[0])).attr("cy", y(p[1])).attr("r", 5).attr("fill", css(s.color)).attr("stroke", css("--papel")).attr("stroke-width", 2);
+    g.append("text").attr("class", "et").style("font-weight", 600).attr("x", x(p[0]) + (p[0] > 2020 ? -8 : 8)).attr("y", y(p[1]) - 10)
+      .attr("text-anchor", p[0] > 2020 ? "end" : "start").text(fmt(p[1]));
+  }
+  g.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("pointermove", e => {
+      const a = Math.round(x.invert(d3.pointer(e)[0]));
+      mostrarTip(e, String(a), series.map(s => [s.nombre, fmt(s.d.find(p => p[0] === a)[1])]));
+    })
+    .on("pointerleave", ocultarTip)
+    .on("click", e => { const a = Math.round(x.invert(d3.pointer(e)[0])); estado.anio = a; d3.select("#anio").property("value", a); pintar(); });
+}
+
+function aporte() {
+  const g = d3.select("#aporte"); g.selectAll("*").remove();
+  const W = ancho(), H = 300, m = { l: W < 1000 ? 200 : 290, r: 120, t: 4, b: 4 };
+  g.attr("viewBox", `0 0 ${W} ${H}`);
+  const y = d3.scaleBand().domain(D.aporte.map(d => d[0])).range([m.t, H - m.b]).padding(0.25);
+  const x = d3.scaleLinear().domain([0, d3.max(D.aporte, d => d[2])]).range([m.l, W - m.r]);
+  const f = g.selectAll("g").data(D.aporte).join("g").attr("transform", d => `translate(0,${y(d[0])})`);
+  f.append("rect").attr("x", m.l).attr("height", y.bandwidth()).attr("rx", 2).attr("width", d => Math.max(1, x(d[2]) - m.l))
+    .attr("fill", d => DESTACA.has(d[0]) ? css("--ocre") : css("--serie-1"));
+  f.append("text").attr("class", "et").attr("x", m.l - 8).attr("y", y.bandwidth() / 2).attr("dy", "0.35em").attr("text-anchor", "end").text(d => d[0].length > (W < 1000 ? 28 : 40) ? d[0].slice(0, W < 1000 ? 27 : 39) + "…" : d[0]);
+  f.append("text").attr("class", "et-2").attr("x", d => x(d[2]) + 6).attr("y", y.bandwidth() / 2).attr("dy", "0.35em").text(d => `${num(d[2], 1)} % · ${firmado(d[1] / 1e6, 0)} M`);
+}
+
+function pintar() {
+  d3.select("#anioV").text(estado.anio);
+  d3.select("#flujoSeg").selectAll("button").attr("aria-pressed", d => String(d[0] === estado.flujo));
+  d3.select("#concSeg").selectAll("button").attr("aria-pressed", d => String(d[0] === estado.conc));
+  const exp = estado.flujo === "Exp";
+  d3.select("#tSocios").text(exp ? `¿A dónde van las exportaciones en ${estado.anio}?` : `¿De dónde vienen las importaciones en ${estado.anio}?`);
+  d3.select("#tCap").text(exp ? `¿Qué se exporta en ${estado.anio}?` : `¿Qué se importa en ${estado.anio}?`);
+  cifras();
+  barrasH("#socios", delAño(D.socios));
+  barrasH("#capitulos", delAño(D.capitulos));
+  const c = CONC[estado.conc];
+  d3.select("#pConc").text(c.texto);
+  serieAnual("#conc", [{ nombre: c.nombre, color: "--ocre", d: D.conc.map(f => [f[0], f[c.i]]) }], c.fmt,
+    estado.conc === "hhi" ? [0, 0.3] : [0, 100]);
+  serieAnual("#balanza", [
+    { nombre: "Exportaciones", color: "--serie-1", d: D.balanza.map(f => [f[0], f[1]]) },
+    { nombre: "Importaciones", color: "--serie-2", d: D.balanza.map(f => [f[0], f[2]]) },
+  ], v => "$" + num(v, 0));
+  aporte();
+}
+pintar();
+alCambiarTema(pintar);
+alRedimensionar(pintar);
+</script>
+</body>
+</html>
